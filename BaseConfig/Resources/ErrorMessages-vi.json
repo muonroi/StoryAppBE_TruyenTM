@@ -1,0 +1,145 @@
+{
+  //Story
+  "ST00": "Tiêu đề truyện không được để trống",
+  "ST01": "Tiêu đề truyện vượt quá kí tự tối đa (255)",
+  "ST02": "Tiêu đề truyện tối thiểu 3 kí tự",
+  "ST03": "Mô tả về truyện không được để trống",
+  "ST04": "Mô tả truyện vượt quá kí tự quy định (5000)",
+  "ST05": "Mô tả truyện tối thiểu phải từ 100 kí tự",
+  "ST06": "Đường dẫn ảnh không được để trống",
+  "ST07": "Đường dẫn vượt quá kí tự quy định (1000)",
+  "ST08": "Vui lòng chọn trạng thái truyện (Công khai | Riêng tư)",
+  "ST09": "Tên truyện đã tồn tại",
+  "ST10": "Truyện không tồn tại",
+  "ST11": "Có lỗi xảy ra khi thêm truyện. Vui lòng thử lại",
+  "ST12": "Số lượng dữ liệu lấy ra phải nhỏ hơn hoặc bằng 200",
+  "ST13": "Cập nhật lượt xem không thành công",
+  "ST14": "Truyện đã được thích",
+  "ST15": "Nội dung cập nhật trống",
+  // --------------------\
+
+  //Story notification
+  "NT00": "Đường dẫn thông báo không được trống",
+  "NT01": "Độ dài tối đa của đường dẫn là 1000 kí tự",
+  "NT02": "Tiêu đề không được để trống",
+  "NT03": "Tiêu đề vượt quá kí tự quy định 200 kí tự",
+  "NT04": "Nội dung không được để trống",
+  "NT05": "Nội dung vượt quá kí tự quy định 350 kí tự",
+  // --------------------\
+
+  //Tag
+  "TT00": "Tên thẻ không được trống",
+  "TT01": "Tên thẻ quá dài (nhỏ hơn hoặc bằng 50 kí tự)",
+  "TT02": "Tên thẻ phải từ 3 kí tự trở lên",
+  "TT03": "Mô tả thẻ không được trống",
+  "TT04": "Mô tả thẻ quá dài ( nhỏ hơn hoặc bằng 500 kí tự)",
+  "TT05": "Vui lòng chọn thẻ",
+  "TT06": "Vui lòng chọn truyện",
+  "TT07": "Vui lòng chọn chương truyện",
+  "TT08": "Thẻ không tồn tại",
+  "TT09": "Thêm thẻ thất bại.Vui lòng thử lại",
+  "TT10": "Số lượng thẻ phải nhỏ hơn 30",
+  "TT11": "Thẻ đã tồn tại",
+  //--------------------\
+  //User Member
+  "USR01C": "Mật khẩu không hợp lệ",
+  "USR02C": "Tài khoản không tồn tại",
+  "USR03C": "Tên người dùng bắt buộc phải nhập",
+  "USR08C": "Tên người dùng tối đa 100 kí tự",
+  "USR04C": "Họ và tên đệm bắt buộc phải nhập",
+  "USR09C": "Họ và tên đệm tối đa 100 kí tự",
+  "USR05C": "Tài khoản bắt buộc phải nhập",
+  "USR10C": "Tài khoản tối đa 100 kí tự",
+  "USR06C": "Mật khẩu bắt buộc phải nhập",
+  "USR11C": "Mật khẩu tối đa 1000",
+  "USR07C": "Key mã hóa bắt buộc phải nhập",
+  "USR12C": "Key mã hóa tối đa 1000 kí tự",
+  "USR13C": "Tài khoản đã tồn tại",
+  "USR14C": "Tài khoản chỉ cho phép [a-z,A-Z,0-9,_]",
+  "USR15C": "Tài khoản tối thiểu 4 kí tự",
+  "USR17C": "• Ít nhất một chữ cái viết hoa • ít nhất một chữ cái viết thường • Ít nhất một chữ số • Ít nhất một ký tự đặc biệt",
+  "USR16C": "Tài khoản tối thiểu 8 kí tự",
+  "USR18C": "Địa chỉ không quá 1000 kí tự",
+  "USR19C": "Email không đúng định dạng",
+  "USR20C": "Email không quá 1000 kí tự",
+  "USR21C": "Số điện thoại liên hệ phải lớn hơn hoặc bằng 10 kí tự",
+  "USR22C": "Trạng thái bắt buộc phải nhập",
+  "USR23C": "Mã kích hoạt không hợp lệ",
+  "USR24C": "Mật khẩu mới phải khác mật khẩu cũ",
+  "USR25C": "Mật khẩu cũ không đúng",
+  "USR26C": "Mật khẩu tối thiếu 8 kí tự",
+  "USR27C": "Pagezie không quá 100 dòng",
+  "USR28C": "Tài khoản bị khóa",
+  "USR29C": "Có lỗi xảy ra vui lòng thử lại",
+  "USR30C": "Tối thiểu 3 kí tự",
+  "USR31C": "Email bắt buộc phải nhập",
+  "USR32C": "Địa chỉ không được trống",
+  "USRC33C": "Địa chỉ tối thiểu 10 kí tự",
+  "USRC34C": "Ngày sinh không hợp lệ (tuổi phải lớn hơn 10, năm sinh > 1970)",
+  "USRC35C": "Giới tính lựa chọn không hợp lệ",
+  "USRC36C": "Token không hợp lệ hoặc đã hết hạn",
+  "USRC37C": "Cập nhật trạng thái xác minh thất bại",
+  "USRC38C": "Ngày sinh không được trống",
+  "USRC39C": "Tài khoản hoặc mật khẩu không chính xác",
+  "USRC40C": "Email đã tồn tại.",
+  "USRC41C": "Ảnh lỗi! Vui lòng thử lại.",
+  "USRC42C": "Không thể thay đổi mật khẩu bây giờ vui lòng thử lại sau ít phút.",
+  "USRC43C": "Vui lòng đổi mật khẩu mặc định thành mật khẩu mới.",
+  "USRC44C": "Không tìm thấy refresh token thuộc người dùng",
+  "USRC45C": "Refresh token không hợp lệ",
+  "USRC46C": "Nhóm không tồn tại",
+  "USRC47C": "Vui lòng đăng nhập lại",
+  "USRC48C": "Yêu cầu quá nhiều vui lòng thử lại sau",
+  "USRC49C": "Định dạng đầu vào không hợp lệ",
+  "USRC50C": "Cập nhật thất bại vui lòng liên hệ đội ngũ phát triển",
+  "USRC51C": "Thêm thất bại vui lòng liên hệ đội ngũ phát triển",
+  "USRC52C": "Xoá thất bại vui lòng liên hệ đội ngũ phát triển",
+  //--------------------\
+
+  //Role
+  "ROL01C": "Danh sách quyền không được null",
+  "ROL02C": "Quyền không tồn tại",
+  "ROL03C": "Tên quyền không đúng",
+  "ROL04C": "Tên quyền bắt buộc nhập",
+  "ROL05C": "Tên quyền tối đa 100 kí tự",
+  "ROL06C": "Mô tả quyền không quá 1000 kí tự",
+  "ROL07C": "Tên quyền đã tồn tại",
+  //--------------------\
+
+  //Group
+  "GRP01C": "Tên nhóm không được bỏ trống",
+  "GRP02C": "Mô tả nhóm không được quá 500 kí tự",
+  "GRP04C": "Nhóm không tồn tại",
+  "GRP06C": "Tên nhóm không quá 100 kí tự",
+  "GRP09C": "Mã nhóm không được trống",
+  "GRP10C": "Mã nhóm không quá 100 kí tự",
+  "GRP13C": "Nhóm đã tồn tại",
+  //--------------------\
+
+
+  //Chapter
+  "CT00": "Tiêu đề chương không được để trống",
+  "CT01": "Tiêu đề chương vượt quá kí tự quy định (255)",
+  "CT02": "Tiêu đề chương phải từ 3 kí tự trở lên",
+  "CT04": "Nội dung truyện không được trống",
+  "CT05": "Nội dung truyện vượt quá kí tự quy định (100000)",
+  "CT06": "Nội dung truyện phải từ 750 kí tự trở lên",
+  "CT07": "Số chương không được để trống",
+  "CT08": "Số chương vượt quá kí tự quy định 200",
+  "CT09": "Số chữ trong truyện không được trống",
+  "CT10": "Đường dẫn chương truyện",
+  "CT11": "Chương không tồn tại",
+  //--------------------\
+
+  //Category
+  "CTS00": "Tên danh mục không được trống",
+  "CTS01": "Vui lòng chọn danh mục",
+  "CTS02": "Danh mục không tồn tại",
+  "CTS03": "Số lượng phải nhỏ hơn 100",
+  "CTS04": "Tên danh mục đã tồn tại",
+  //--------------------\
+
+  //Tag in story
+  "TIS01": " Tag id or story guid is not exist"
+  //--------------------\
+}

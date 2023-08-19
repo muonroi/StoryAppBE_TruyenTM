@@ -1,0 +1,145 @@
+{
+  //Story
+  "ST00": "Story title cannot be empty",
+  "ST01": "Story title exceeds the maximum character limit (255)",
+  "ST02": "Story title must have a minimum of 3 characters",
+  "ST03": "Story description cannot be empty",
+  "ST04": "Story description exceeds the maximum character limit (5000)",
+  "ST05": "Story description must have a minimum of 100 characters",
+  "ST06": "Image path cannot be empty",
+  "ST07": "Image path exceeds the maximum character limit (1000)",
+  "ST08": "Please select a story status (Public | Private)",
+  "ST09": "Story title already exists",
+  "ST10": "Story does not exist",
+  "ST11": "An error occurred while adding the story. Please try again",
+  "ST12": "The amount of data retrieved must be less than or equal to 200",
+  "ST13": "Failed to update view count",
+  "ST14": "Story has been liked",
+  "ST15": "Update content is empty",
+  //--------------------\
+
+  //Story notification
+  "NT00": "Notification path cannot be empty",
+  "NT01": "Maximum length of the path is 1000 characters",
+  "NT02": "Title cannot be empty",
+  "NT03": "Title exceeds the maximum character limit (200)",
+  "NT04": "Content cannot be empty",
+  "NT05": "Content exceeds the maximum character limit (350)",
+  //--------------------\
+
+  //Tag
+  "TT00": "Tag name cannot be empty",
+  "TT01": "Tag name is too long (less than or equal to 50 characters)",
+  "TT02": "Tag name must have a minimum of 3 characters",
+  "TT03": "Tag description cannot be empty",
+  "TT04": "Tag description is too long (less than or equal to 500 characters)",
+  "TT05": "Please select a tag",
+  "TT06": "Please select a story",
+  "TT07": "Please select a story chapter",
+  "TT08": "Tag does not exist",
+  "TT09": "Failed to add tag. Please try again",
+  "TT10": "The number of tags must be less than 30",
+  "TT11": "Tag already exists",
+  //--------------------\
+
+  //User Member
+  "USR01C": "Invalid password",
+  "USR02C": "Account does not exist",
+  "USR03C": "Username is required",
+  "USR08C": "Username maximum length is 100 characters",
+  "USR04C": "First and last name are required",
+  "USR09C": "First and last name maximum length is 100 characters",
+  "USR05C": "Account is required",
+  "USR10C": "Account maximum length is 100 characters",
+  "USR06C": "Password is required",
+  "USR11C": "Password maximum length is 1000",
+  "USR07C": "Encryption key is required",
+  "USR12C": "Encryption key maximum length is 1000 characters",
+  "USR13C": "Account already exists",
+  "USR14C": "Account only allows [a-z, A-Z, 0-9, _]",
+  "USR15C": "Account must have a minimum of 4 characters",
+  "USR17C": "• At least one uppercase letter • At least one lowercase letter • At least one digit • At least one special character",
+  "USR16C": "Account must have a minimum of 8 characters",
+  "USR18C": "Address cannot exceed 1000 characters",
+  "USR19C": "Email is not in the correct format",
+  "USR20C": "Email cannot exceed 1000 characters",
+  "USR21C": "Contact phone number must be greater than or equal to 10 characters",
+  "USR22C": "Status is required",
+  "USR23C": "Invalid activation code",
+  "USR24C": "New password must be different from the old password",
+  "USR25C": "Incorrect old password",
+  "USR26C": "Password must have a minimum of 8 characters",
+  "USR27C": "Page size cannot exceed 100 lines",
+  "USR28C": "Account is locked",
+  "USR29C": "An error occurred. Please try again",
+  "USR30C": "Minimum of 3 characters",
+  "USR31C": "Email is required",
+  "USR32C": "Address cannot be empty",
+  "USRC33C": "Address must have a minimum of 10 characters",
+  "USRC34C": "Invalid birthdate (age must be greater than 10, year of birth > 1970)",
+  "USRC35C": "Invalid gender selection",
+  "USRC36C": "Invalid or expired token",
+  "USRC37C": "Failed to update verification status",
+  "USRC38C": "Birthdate cannot be empty",
+  "USRC39C": "Incorrect account or password",
+  "USRC40C": "Email already exists",
+  "USRC41C": "Image error! Please try again",
+  "USRC42C": "Cannot change password now. Please try again later.",
+  "USRC43C": "Please change the default password to a new one.",
+  "USRC44C": "Refresh token belonging to the user not found",
+  "USRC45C": "Invalid refresh token",
+  "USRC46C": "Group does not exist",
+  "USRC47C": "Please log in again",
+  "USRC48C": "Too many requests. Please try again later",
+  "USRC49C": "Invalid input format",
+  "USRC50C": "Update failed. Please contact the development team",
+  "USRC51C": "Failed to add. Please contact the development team",
+  "USRC52C": "Failed to delete. Please contact the development team",
+  //--------------------\
+
+  //Role
+  "ROL01C": "Role list cannot be null",
+  "ROL02C": "Role does not exist",
+  "ROL03C": "Invalid role name",
+  "ROL04C": "Role name is required",
+  "ROL05C": "Role name maximum length is 100 characters",
+  "ROL06C": "Role description cannot exceed 1000 characters",
+  "ROL07C": "Role name already exists",
+  //--------------------\
+
+  //Group
+  "GRP01C": "Group name cannot be empty",
+  "GRP02C": "Group description cannot exceed 500 characters",
+  "GRP04C": "Group does not exist",
+  "GRP06C": "Group name cannot exceed 100 characters",
+  "GRP09C": "Group code cannot be empty",
+  "GRP10C": "Group code cannot exceed 100 characters",
+  "GRP13C": "Group already exists",
+  //--------------------\
+
+  //Chapter
+  "CT00": "Chapter title cannot be empty",
+  "CT01": "Chapter title exceeds the maximum character limit (255)",
+  "CT02": "Chapter title must have a minimum of 3 characters",
+  "CT04": "Story content cannot be empty",
+  "CT05": "Story content exceeds the maximum character limit (100000)",
+  "CT06": "Story content must have a minimum of 750 characters",
+  "CT07": "Chapter number cannot be empty",
+  "CT08": "Chapter number exceeds the maximum character limit (200)",
+  "CT09": "The number of characters in the story cannot be empty",
+  "CT10": "Story chapter path",
+  "CT11": "Chapter does not exist",
+  //--------------------\
+
+  //Category
+  "CTS00": "Category name cannot be empty",
+  "CTS01": "Please select a category",
+  "CTS02": "Category does not exist",
+  "CTS03": "The number must be less than 100",
+  "CTS04": "Category name already exists",
+  //--------------------\
+
+  //Tag in story
+  "TIS01": "Tag id or story guid is not exist"
+  //--------------------\
+}

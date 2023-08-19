@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuonRoiSocialNetwork", "MuonRoiSocialNetwork\MuonRoiSocialNetwork.csproj", "{2A22B71C-4B58-41E1-A953-C8F4BA8B5672}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuonRoiSocialNetwork.Common", "MuonRoiSocialNetwork.Common\MuonRoiSocialNetwork.Common.csproj", "{81220899-C466-4BFE-A71B-F8A8514E7125}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseConfig", "BaseConfig\BaseConfig.csproj", "{AE2B31BA-7BF8-476F-8EF8-E4540C79FBAE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{52EB6D1B-31C9-4373-B52A-B73463150434}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuonRoiSocialNetwork.Test", "MuonRoiSocialNetwork.Test\MuonRoiSocialNetwork.Test.csproj", "{6260F507-D27B-4235-90B7-ACB3D8DC12D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A22B71C-4B58-41E1-A953-C8F4BA8B5672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A22B71C-4B58-41E1-A953-C8F4BA8B5672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A22B71C-4B58-41E1-A953-C8F4BA8B5672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A22B71C-4B58-41E1-A953-C8F4BA8B5672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81220899-C466-4BFE-A71B-F8A8514E7125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81220899-C466-4BFE-A71B-F8A8514E7125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81220899-C466-4BFE-A71B-F8A8514E7125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81220899-C466-4BFE-A71B-F8A8514E7125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE2B31BA-7BF8-476F-8EF8-E4540C79FBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE2B31BA-7BF8-476F-8EF8-E4540C79FBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE2B31BA-7BF8-476F-8EF8-E4540C79FBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE2B31BA-7BF8-476F-8EF8-E4540C79FBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6260F507-D27B-4235-90B7-ACB3D8DC12D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6260F507-D27B-4235-90B7-ACB3D8DC12D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6260F507-D27B-4235-90B7-ACB3D8DC12D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6260F507-D27B-4235-90B7-ACB3D8DC12D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD91CCFC-AD99-4FFF-B346-B06DAB67826C}
+	EndGlobalSection
+EndGlobal
