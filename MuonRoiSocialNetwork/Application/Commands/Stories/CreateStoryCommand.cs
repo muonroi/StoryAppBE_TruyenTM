@@ -2,6 +2,7 @@
 using BaseConfig.EntityObject.Entity;
 using BaseConfig.Exeptions;
 using BaseConfig.Extentions.Image;
+using BaseConfig.Extentions.String;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using MediatR;
@@ -71,8 +72,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 }
                 Story newStory = _mapper.Map<Story>(request);
                 newStory.AuthorName = request.AuthorName;
-                string normalizedInput = NormalizeString(request.StoryTitle);
-                newStory.Slug = _slugHelper.GenerateSlug(normalizedInput);
+                newStory.Slug = StringManagers.GenerateSlug(request.StoryTitle);
                 newStory.ImgUrl = "img";
                 if (!newStory.IsValid())
                 {

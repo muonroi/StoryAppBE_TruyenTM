@@ -14,7 +14,7 @@ namespace MuonRoiSocialNetwork.Common.Models.Chapter.Base.Response
         public string Body { get; set; } = string.Empty;
 
         [JsonProperty("numberOfChapter")]
-        public string NumberOfChapter { get; set; } = string.Empty;
+        public long NumberOfChapter { get; set; }
 
         [JsonProperty("numberOfWord")]
         public int NumberOfWord { get; set; }

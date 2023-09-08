@@ -14,6 +14,7 @@ using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoi.Social_Network.Storys;
 using Serilog;
+using BaseConfig.Extentions.String;
 
 namespace MuonRoiSocialNetwork.Application.Commands.Chapter
 {
@@ -73,10 +74,8 @@ namespace MuonRoiSocialNetwork.Application.Commands.Chapter
                 #region Validation
 
                 newChapter = _mapper.Map<ChapterEntites>(request);
-                request.ChapterTitle = request.ChapterTitle.ToLower().Replace('đ', 'd');
-                string normalizedInput = NormalizeString(request.ChapterTitle);
                 char[] delimiters = new char[] { ' ', '\r', '\n' };
-                newChapter.Slug = _slugHelper.GenerateSlug(normalizedInput);
+                newChapter.Slug = StringManagers.GenerateSlug(request.ChapterTitle);
                 newChapter.NumberOfWord = newChapter.Body.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
                 if (!newChapter.IsValid())
                 {

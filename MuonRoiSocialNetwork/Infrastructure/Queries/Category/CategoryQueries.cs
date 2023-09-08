@@ -9,8 +9,9 @@ using MuonRoiSocialNetwork.Common.Models.Category.Response;
 using MuonRoi.Social_Network.Categories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using MuonRoiSocialNetwork.Common.Settings.StorySettings;
 using MuonRoiSocialNetwork.Infrastructure.Helpers;
+using MuonRoiSocialNetwork.Common.Settings.StorySettings;
+
 namespace MuonRoiSocialNetwork.Infrastructure.Queries.Category
 {
     /// <summary>

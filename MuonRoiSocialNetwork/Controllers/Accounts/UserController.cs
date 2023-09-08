@@ -16,12 +16,15 @@ using Newtonsoft.Json;
 using Serilog;
 using MuonRoiSocialNetwork.Common.Models.Logs;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
+
 namespace MuonRoiSocialNetwork.Controllers.Accounts
 {
     /// <summary>
     /// Auth: PhiLe 20230305
     /// </summary>
-    [Route("api/users")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/users")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase

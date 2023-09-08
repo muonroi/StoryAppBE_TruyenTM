@@ -4,14 +4,18 @@ using BaseConfig.Exeptions;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using MuonRoi.Social_Network.Roles;
 using MuonRoi.Social_Network.Users;
 using MuonRoiSocialNetwork.Application.Commands.Base.Users;
 using MuonRoiSocialNetwork.Application.Commands.GroupAndRoles;
+using MuonRoiSocialNetwork.Common.Models.Notifications;
 using MuonRoiSocialNetwork.Common.Models.Users.Base.Response;
+using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.GroupAndRoles;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Users;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Users;
+using MuonRoiSocialNetwork.Infrastructure.HubCentral;
 using Serilog;
 
 namespace MuonRoiSocialNetwork.Application.Commands.Users
@@ -33,6 +37,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
     {
         private readonly ILogger<AssignRoleCommandHandler> _logger;
         private readonly IGroupRepository _groupRepository;
+        private readonly IHubContext<NotificationHub> _hubContext;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -43,10 +48,12 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
         /// <param name="logger"></param>
         /// <param name="groupRepository"></param>
         /// <param name="authContext"></param>
-        public AssignUserToGroupCommandHandler(IMapper mapper, IConfiguration configuration, IUserQueries userQueries, IUserRepository userRepository, ILoggerFactory logger, IGroupRepository groupRepository, AuthContext authContext) : base(mapper, configuration, userQueries, userRepository, authContext)
+        /// <param name="hubContext"></param>
+        public AssignUserToGroupCommandHandler(IMapper mapper, IConfiguration configuration, IUserQueries userQueries, IUserRepository userRepository, ILoggerFactory logger, IGroupRepository groupRepository, AuthContext authContext, IHubContext<NotificationHub> hubContext) : base(mapper, configuration, userQueries, userRepository, authContext)
         {
             _logger = logger.CreateLogger<AssignRoleCommandHandler>();
             _groupRepository = groupRepository;
+            _hubContext = hubContext;
         }
         /// <summary>
         /// Function handler
@@ -106,6 +113,15 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
                 await _userRepository.UpdateUserAsync(infoUser);
                 #endregion
 
+                #region Push notification
+                await _hubContext.Clients.All.SendAsync(GroupHelperConst.Instance.StreamGlobal, new NotificationModels
+                {
+                    NotificationContent = $"{infoUser.Name}",
+                    TimeCreated = DateTime.Now.ToString("MM/dd"),
+                    Url = infoUser.Avatar ?? string.Empty,
+                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.global
+                }, cancellationToken: cancellationToken);
+                #endregion
                 methodResult.Result = true;
                 return methodResult;
 

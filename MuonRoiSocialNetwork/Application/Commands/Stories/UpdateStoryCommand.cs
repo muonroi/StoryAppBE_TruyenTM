@@ -2,6 +2,7 @@
 using BaseConfig.EntityObject.Entity;
 using BaseConfig.Exeptions;
 using BaseConfig.Extentions.Image;
+using BaseConfig.Extentions.String;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using MediatR;
@@ -83,7 +84,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
 
                 #region Validation
                 Story updateStory = _mapper.Map<Story>(request);
-                string normalizedInput = NormalizeString(request.StoryTitle);
+                string normalizedInput = StringManagers.GenerateSlug(request.StoryTitle);
                 updateStory.Slug = _slugHelper.GenerateSlug(normalizedInput);
                 #endregion
 

@@ -32,6 +32,8 @@ using MuonRoiSocialNetwork.Infrastructure.Repositories.Users;
 using MuonRoiSocialNetwork.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using AutoMapper;
+using MuonRoiSocialNetwork.Infrastructure.HubCentral.Base;
+using Microsoft.AspNetCore.SignalR;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {

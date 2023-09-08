@@ -10,6 +10,7 @@ using MuonRoiSocialNetwork.Application.Commands.Category;
 using MuonRoiSocialNetwork.Common.Models.Category.Request;
 using MuonRoiSocialNetwork.Common.Models.Category.Response;
 using MuonRoiSocialNetwork.Common.Models.Logs;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Category;
 using Newtonsoft.Json;
@@ -22,7 +23,8 @@ namespace MuonRoiSocialNetwork.Controllers.Category
     /// <summary>
     /// Auth: PhiLe 20230531
     /// </summary>
-    [Route("api/categories")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/categories")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CategoryController : ControllerBase
@@ -107,6 +109,7 @@ namespace MuonRoiSocialNetwork.Controllers.Category
                 {
                     IdCategory = idCategory,
                     IsActive = categoryRequest.IsActive,
+                    IconName = categoryRequest.IconName,
                     NameCategory = categoryRequest.NameCategory
                 };
                 MethodResult<CategoryResponse> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
