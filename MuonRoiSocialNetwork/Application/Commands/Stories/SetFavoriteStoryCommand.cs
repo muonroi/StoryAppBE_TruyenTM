@@ -118,7 +118,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Send notification to user favorite
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.VoteHeartToAuthor, existStory.Guid)).SendAsync("ReceiveSingle", new NotificationModels
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new NotificationModels
                 {
                     NotificationContent = $"Your story {existStory.StoryTitle} have new likes!",
                     TimeCreated = DateTime.Now.ToString("MM/dd")

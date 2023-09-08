@@ -8,10 +8,10 @@ namespace MuonRoiSocialNetwork.Common.Models.TagInStories.Base.Response
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("storyGuid")]
-        public Guid StoryGuid { get; set; }
+        [JsonProperty("storyid")]
+        public int StoryId { get; set; }
 
-        [JsonProperty("tagId")]
+        [JsonProperty("tagid")]
         public int TagId { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using BaseConfig.BaseDbContext.BaseQuery;
 using BaseConfig.BaseDbContext.Common;
 using BaseConfig.Extentions.Image;
+using BaseConfig.Extentions.String;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using Microsoft.EntityFrameworkCore;
@@ -233,12 +234,13 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
                 }
                 foreach (var item in tagOfStory)
                 {
-                    if (item.tagsInStory.StoryGuid == resultStories[i].Guid && item.tagsInStory.TagId == item.tagsSingle.Id)
+                    if (item.tagsInStory.StoryId == resultStories[i].Id && item.tagsInStory.TagId == item.tagsSingle.Id)
                     {
                         resultStories[i].NameTag.Add(item.tagsSingle.TagName);
                     }
                 }
                 resultStories[i].ImgUrl = HandlerImages.TakeLinkImage(_configuration, resultStories[i].ImgUrl);
+                resultStories[i].SlugAuthor = StringManagers.GenerateSlug(resultStories[i].AuthorName);
             }
         }
         /// <summary>
@@ -255,10 +257,12 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
                 await SetCacheAsync();
                 checkStatus = await IsCacheExistAsync();
             }
+
             var filteredStoryGuids = checkStatus.TagsInStories
             .Select((x, y) => new { x.StoryId, x.TagId })
             .ToList();
             Story? querySearch = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.Id == storyId);
+
             if (querySearch == null)
             {
                 methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -268,22 +272,19 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
                 );
                 return methodResult;
             }
+
+            StoryModelResponse resultStories = _mapper.Map<StoryModelResponse>(querySearch);
+            var firstAndLastChapter = await _chapterQueries.GetFirstAndLastChapterByStory(storyId);
             var tagOfStory = (from tagsInStory in filteredStoryGuids
                               join tagsSingle in checkStatus.Tags on tagsInStory.TagId equals tagsSingle.Id
                               where !tagsSingle.IsDeleted && tagsInStory.StoryId == querySearch.Id
                               select new { tagsSingle, tagsInStory }).ToList();
-
             CategoryEntities? categoryOfStorys = (from categorys in checkStatus.Categories ?? await _categoryQueries.GetAllAsync().ConfigureAwait(false)
                                                   where !categorys.IsDeleted && categorys.Id == querySearch.CategoryId
                                                   select categorys).FirstOrDefault();
-            StoryModelResponse resultStories = _mapper.Map<StoryModelResponse>(querySearch);
-            resultStories.ImgUrl = HandlerImages.TakeLinkImage(_configuration, resultStories.ImgUrl);
-            resultStories.NameTag = tagOfStory.Select(x => x.tagsSingle.TagName).ToList();
-            resultStories.NameCategory = categoryOfStorys == null ? string.Empty : categoryOfStorys.NameCategory ?? string.Empty;
-            resultStories.UpdatedDateString = GetTimeDifferenceText(resultStories.UpdatedDateTs ?? 0);
-            resultStories.TotalVote = JsonConvert.DeserializeObject<StoryRattings>(querySearch.ListRattings)?.Data.Count ?? 0;
-            resultStories.Rating = Math.Round(resultStories.Rating, 1);
+            SetMoreVariableStory(ref resultStories, tagOfStory.Select(x => x.tagsSingle.TagName).ToList(), categoryOfStorys == null ? string.Empty : categoryOfStorys.NameCategory ?? string.Empty, JsonConvert.DeserializeObject<StoryRattings>(querySearch.ListRattings)?.Data.Count ?? 0, firstAndLastChapter?.Result?.Keys?.FirstOrDefault() ?? 0, firstAndLastChapter?.Result?.Values?.FirstOrDefault() ?? 0);
             methodResult.Result = resultStories;
+
             return methodResult;
         }
         private async Task<CustomTupleItemOfStory> IsCacheExistAsync()
@@ -305,6 +306,18 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
             await _cache.SetRecordAsync($"{StorySettingDefault.Instance.keyModelResponseTags}", tagTemp, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
             await _cache.SetRecordAsync($"{StorySettingDefault.Instance.keyModelResponseTagInStory}", tagInStoryTemp, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
             await _cache.SetRecordAsync($"{StorySettingDefault.Instance.keyModelResponseCategorys}", categoryTemp, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
+        }
+        private void SetMoreVariableStory(ref StoryModelResponse resultStories, List<string> tagName, string nameCategory, int totalVote, long firstChapterId, long lastChapterId)
+        {
+            resultStories.ImgUrl = HandlerImages.TakeLinkImage(_configuration, resultStories.ImgUrl);
+            resultStories.NameTag = tagName;
+            resultStories.NameCategory = nameCategory;
+            resultStories.UpdatedDateString = GetTimeDifferenceText(resultStories.UpdatedDateTs ?? 0);
+            resultStories.TotalVote = totalVote;
+            resultStories.Rating = Math.Round(resultStories.Rating, 1);
+            resultStories.FirstChapterId = firstChapterId;
+            resultStories.LastChapterId = lastChapterId;
+            resultStories.SlugAuthor = StringManagers.GenerateSlug(resultStories.AuthorName);
         }
         /// <summary>
         /// Recommend stories
@@ -383,7 +396,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
         /// </summary>
         /// <param name="timestampFromDatabase"></param>
         /// <returns></returns>
-        public static string GetTimeDifferenceText(double timestampFromDatabase)
+        private static string GetTimeDifferenceText(double timestampFromDatabase)
         {
             DateTime timestamp = DateTimeOffset.FromUnixTimeSeconds((long)timestampFromDatabase).DateTime;
             DateTime currentTime = DateTime.Now;

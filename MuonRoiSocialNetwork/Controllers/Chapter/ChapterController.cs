@@ -19,13 +19,16 @@ using MuonRoiSocialNetwork.Common.Models.Logs;
 using Serilog;
 using Newtonsoft.Json;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
+using static Dapper.SqlMapper;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 
 namespace MuonRoiSocialNetwork.Controllers.Chapter
 {
     /// <summary>
     /// Auth: PhiLe 20230531
     /// </summary>
-    [Route("api/chapters")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/chapters")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChapterController : ControllerBase
@@ -206,19 +209,7 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
         {
             try
             {
-                MethodResult<ChapterModelResponse> methodResult = new();
-                ChapterEntites chapterDetailResult = await _chapterQueries.GetByIdAsync(chapterId).ConfigureAwait(false);
-                if (chapterDetailResult == null)
-                {
-                    methodResult.StatusCode = StatusCodes.Status400BadRequest;
-                    methodResult.AddApiErrorMessage(
-                        nameof(EnumChapterErrorCode.CT11),
-                        new[] { Helpers.GenerateErrorResult(nameof(EnumChapterErrorCode.CT11), nameof(EnumChapterErrorCode.CT11)) }
-                    );
-                    return methodResult.GetActionResult();
-                }
-                methodResult.StatusCode = StatusCodes.Status200OK;
-                methodResult.Result = _mapper.Map<ChapterModelResponse>(chapterDetailResult);
+                MethodResult<ChapterModelResponse> methodResult = await _chapterQueries.GetDetailChapterById(chapterId).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
@@ -256,13 +247,13 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
         /// <returns></returns>
         [HttpGet("group")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(MethodResult<PagingItemsDTO<ChapterModelResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(MethodResult<IEnumerable<ChapterModelResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, int fromChapterId = 0, int pageIndex = 1, int pageSize = 20, bool isSetCache = false)
+        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, long fromChapterId = 0, long toChapterId = 0)
         {
             try
             {
-                MethodResult<PagingItemsDTO<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, fromChapterId, pageIndex, pageSize, isSetCache).ConfigureAwait(false);
+                MethodResult<IEnumerable<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, fromChapterId, toChapterId).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
@@ -285,6 +276,94 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
             try
             {
                 MethodResult<PagingItemsDTO<ChapterModelResponse>> methodResult = await _chapterQueries.GetAllChapterAsync(pageIndex, pageSize, isSetCache).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Next chapter with story id and chapter id API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("next")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<ChapterModelResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> NextChapterByStoryId([FromQuery] int storyId, long chapterId)
+        {
+            try
+            {
+                MethodResult<ChapterModelResponse> methodResult = await _chapterQueries.NextChapterByStoryId(storyId, chapterId).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Previous chapter with story id and chapter id API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("previous")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<ChapterModelResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> PreviousChapterByStoryId([FromQuery] int storyId, long chapterId)
+        {
+            try
+            {
+                MethodResult<ChapterModelResponse> methodResult = await _chapterQueries.PreviousChapterByStoryId(storyId, chapterId).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Get list chapter and paging according by 100 chapters each chunk API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("paging-chapter")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<List<ChapterListPagingResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> PagingChapterListByStoryId([FromQuery] int storyId)
+        {
+            try
+            {
+                MethodResult<List<ChapterListPagingResponse>> methodResult = await _chapterQueries.PagingChapterListByStoryId(storyId).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Get chunk chapter each 250 character API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("chunk-chapter")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<ChapterChunkResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ChunkChapterListByStoryId([FromQuery] int chapterId, int chunkSize = 250)
+        {
+            try
+            {
+                MethodResult<ChapterChunkResponse> methodResult = await _chapterQueries.ChunkChapterListByStoryId(chapterId, chunkSize).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)

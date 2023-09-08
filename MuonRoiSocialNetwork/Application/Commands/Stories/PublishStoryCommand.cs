@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BaseConfig.EntityObject.Entity;
+using BaseConfig.Extentions.String;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
+using Flurl.Http;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using MuonRoi.Social_Network.Storys;
@@ -88,10 +90,13 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Send notification to user favorite
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, existStory.Guid)).SendAsync("ReceiveNotification", new NotificationModels
+
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, StringManagers.GenerateSlug(existStory.AuthorName))).SendAsync(GroupHelperConst.Instance.StreamNameFavorite, new NotificationModels
                 {
-                    NotificationContent = $"Your story {existStory.StoryTitle} was published",
-                    TimeCreated = DateTime.Now.ToString("MM/dd")
+                    NotificationContent = $"{existStory.StoryTitle}",
+                    TimeCreated = DateTime.Now.ToString("MM/dd"),
+                    Url = existStory.ImgUrl,
+                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.storyFavorite
                 }, cancellationToken: cancellationToken);
                 #endregion
             }

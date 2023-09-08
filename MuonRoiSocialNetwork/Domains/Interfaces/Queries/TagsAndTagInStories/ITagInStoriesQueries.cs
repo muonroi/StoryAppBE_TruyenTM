@@ -16,13 +16,13 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.TagsAndTagInStories
         /// <param name="idTag"></param>
         /// <param name="storyId"></param>
         /// <returns></returns>
-        Task<MethodResult<TagInStoriesModelResponse>> GetTagById(int idTag, int storyId);
+        Task<MethodResult<TagInStoriesModelResponse>> GetTagInStoriesById(int idTag, int storyId);
         /// <summary>
         /// Get all tag in story
         /// </summary>
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        Task<MethodResult<List<TagInStoriesModelResponse>>> GetAllTagInStory(int pageSize, int pageIndex);
+        Task<MethodResult<List<TagInStoriesModelResponse>>> GetAllTagInStory(int pageIndex, int pageSize);
     }
 }

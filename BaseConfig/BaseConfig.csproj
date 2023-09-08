@@ -33,6 +33,7 @@
     <PackageReference Include="MongoDB.Bson" Version="2.19.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPOI" Version="2.6.0" />
+    <PackageReference Include="Slugify.Core" Version="4.0.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>
 

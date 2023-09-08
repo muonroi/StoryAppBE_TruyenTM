@@ -140,6 +140,7 @@
   //--------------------\
 
   //Tag in story
-  "TIS01": " Tag id or story guid is not exist"
+  "TIS01": "Không tìm thấy dữ liệu",
+  "TIS02": "danh mục đã thuộc truyện"
   //--------------------\
 }

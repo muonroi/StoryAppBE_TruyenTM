@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using MuonRoiSocialNetwork.Application.Commands.Tags;
 using MuonRoiSocialNetwork.Common.Models.Logs;
 using MuonRoiSocialNetwork.Common.Models.TagInStories.Request;
+using MuonRoiSocialNetwork.Common.Models.TagInStories.Response;
 using MuonRoiSocialNetwork.Common.Models.Tags.Request;
 using MuonRoiSocialNetwork.Common.Models.Tags.Response;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.TagsAndTagInStories;
 using Newtonsoft.Json;
@@ -23,7 +25,8 @@ namespace MuonRoiSocialNetwork.Controllers.Tag
     /// <summary>
     /// Auth: PhiLe 20230531
     /// </summary>
-    [Route("api/tags")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/tags")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TagController : ControllerBase
@@ -32,6 +35,7 @@ namespace MuonRoiSocialNetwork.Controllers.Tag
         private readonly AuthContext _auth;
         private readonly IMediator _mediator;
         private readonly ITagQueries _tagQueries;
+        private readonly ITagInStoriesQueries _tagInStoriesQueries;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -39,12 +43,14 @@ namespace MuonRoiSocialNetwork.Controllers.Tag
         /// <param name="tagQueries"></param>
         /// <param name="auth"></param>
         /// <param name="httpContextAccessor"></param>
-        public TagController(IMediator mediator, ITagQueries tagQueries, AuthContext auth, IHttpContextAccessor httpContextAccessor)
+        /// <param name="tagInStoriesQueries"></param>
+        public TagController(IMediator mediator, ITagQueries tagQueries, AuthContext auth, IHttpContextAccessor httpContextAccessor, ITagInStoriesQueries tagInStoriesQueries)
         {
             _auth = auth;
             _httpContextAccessor = httpContextAccessor;
             _mediator = mediator;
             _tagQueries = tagQueries;
+            _tagInStoriesQueries = tagInStoriesQueries;
         }
         #region Repository
         /// <summary>
@@ -332,11 +338,55 @@ namespace MuonRoiSocialNetwork.Controllers.Tag
         [AllowAnonymous]
         [ProducesResponseType(typeof(MethodResult<PagingItemsDTO<TagModelResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetCategories([FromQuery] int pageSize = 1, int pageIndex = 10)
+        public async Task<IActionResult> GetTags([FromQuery] int pageSize = 1, int pageIndex = 10)
         {
             try
             {
                 MethodResult<PagingItemsDTO<TagModelResponse>> methodResult = await _tagQueries.GetAllTag(pageSize, pageIndex);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Get all tag in stories API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("stories/all")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<List<TagInStoriesModelResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetTagInStories([FromQuery] int pageSize = 1, int pageIndex = 10)
+        {
+            try
+            {
+                MethodResult<List<TagInStoriesModelResponse>> methodResult = await _tagInStoriesQueries.GetAllTagInStory(pageIndex, pageSize);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Get special tag in stories API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("stories/tag-story")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<TagInStoriesModelResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetTagInStoriesById([FromQuery] int tagId, int storyId)
+        {
+            try
+            {
+                MethodResult<TagInStoriesModelResponse> methodResult = await _tagInStoriesQueries.GetTagInStoriesById(tagId, storyId);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)

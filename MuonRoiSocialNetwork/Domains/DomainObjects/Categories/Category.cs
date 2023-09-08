@@ -22,6 +22,11 @@ namespace MuonRoi.Social_Network.Categories
         [Column("is_active")]
         public bool IsActive { get; set; }
         /// <summary>
+        /// Icon category
+        /// </summary>
+        [Column("icon")]
+        public string IconName { get; set; } = string.Empty;
+        /// <summary>
         /// Storys of category
         /// </summary>
         public List<Story>? Storys { get; set; }

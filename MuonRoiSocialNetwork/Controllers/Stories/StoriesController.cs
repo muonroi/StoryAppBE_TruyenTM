@@ -11,6 +11,7 @@ using MuonRoiSocialNetwork.Common.Models.Logs;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request.Search;
 using MuonRoiSocialNetwork.Common.Models.Stories.Response;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using Newtonsoft.Json;
@@ -23,7 +24,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
     /// <summary>
     /// Auth: PhiLe 20230429
     /// </summary>
-    [Route("api/stories")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/stories")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class StoriesController : ControllerBase
@@ -589,6 +591,7 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                 return errCommandResult.GetActionResult();
             }
         }
+
         #endregion
     }
 }

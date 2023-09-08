@@ -140,6 +140,7 @@
   //--------------------\
 
   //Tag in story
-  "TIS01": "Tag id or story guid is not exist"
+  "TIS01": "Tag id or story guid is not exist",
+  "TIS02": "Tag is a really assign to story"
   //--------------------\
 }

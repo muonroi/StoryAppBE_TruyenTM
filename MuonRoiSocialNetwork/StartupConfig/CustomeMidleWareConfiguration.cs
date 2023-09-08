@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Options;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral;
 
 namespace MuonRoiSocialNetwork.StartupConfig
@@ -23,7 +24,8 @@ namespace MuonRoiSocialNetwork.StartupConfig
                     return Task.CompletedTask;
                 });
                 endpoints.MapHangfireDashboard();
-                endpoints.MapHub<NotificationHub>("/notificationHub");
+                endpoints.MapHub<NotificationHub>("/hubs/noti-hub");
+                endpoints.MapHub<ChatHub>("/hubs/chat-hub");
             });
             CustomHangfireJobConfiguration.RegisterJobs();
             app.UseHangfireDashboard();

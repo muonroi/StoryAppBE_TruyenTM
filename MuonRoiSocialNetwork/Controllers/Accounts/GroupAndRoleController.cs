@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using MuonRoiSocialNetwork.Application.Commands.GroupAndRoles;
 using MuonRoiSocialNetwork.Common.Models.GroupAndRoles.Base.Response;
 using MuonRoiSocialNetwork.Common.Models.Logs;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using Newtonsoft.Json;
 using Serilog;
@@ -18,7 +19,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
     /// <summary>
     /// Auth: PhiLe 202303028
     /// </summary>
-    [Route("api/groups")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/groups")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GroupAndRoleController : ControllerBase

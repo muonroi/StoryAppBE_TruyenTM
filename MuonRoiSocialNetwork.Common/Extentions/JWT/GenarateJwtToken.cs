@@ -27,7 +27,8 @@ namespace BaseConfig.JWT
                 new Claim("username", user.Username ?? ""),
                 new Claim("user_id", user.Id.ToString()),
                 new Claim("email", user.Email ?? ""),
-                new Claim("group_id", user.GroupId.ToString())
+                new Claim("group_id", user.GroupId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
             };
             if (listRoles != null && listRoles.Any())
             {

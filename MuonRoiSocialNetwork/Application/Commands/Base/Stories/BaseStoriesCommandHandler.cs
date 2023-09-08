@@ -50,23 +50,5 @@ namespace MuonRoiSocialNetwork.Application.Commands.Base.Stories
             _storiesQuerie = storiesQuerie;
             _slugHelper = new();
         }
-        /// <summary>
-        /// Nomarlize text after genarate text to slug
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        protected string NormalizeString(string input)
-        {
-            var normalizedStringBuilder = new StringBuilder();
-            foreach (char c in input.Normalize(NormalizationForm.FormD))
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-                {
-                    normalizedStringBuilder.Append(c);
-                }
-            }
-
-            return normalizedStringBuilder.ToString().Normalize(NormalizationForm.FormC);
-        }
     }
 }

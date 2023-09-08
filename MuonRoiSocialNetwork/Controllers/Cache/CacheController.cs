@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using MuonRoiSocialNetwork.Common.Models.Logs;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using MuonRoiSocialNetwork.Infrastructure.Helpers;
 using Newtonsoft.Json;
@@ -17,8 +18,9 @@ namespace MuonRoiSocialNetwork.Controllers.Cache
     /// <summary>
     /// Auth: PhiLe 20230609
     /// </summary>
-    [Route("api/caches")]
-    //[Authorize(Policy = RoleSettings.admin)]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/caches")]
+    [Authorize(Policy = nameof(RoleSettings.SU))]
     [ApiController]
     public class CacheController : ControllerBase
     {

@@ -69,6 +69,8 @@ namespace MuonRoiSocialNetwork.StartupConfig
             configuration.CreateMap<UpdateTagCommand, Tag>();
             configuration.CreateMap<CreateTagInStoryCommand, TagInStory>();
             configuration.CreateMap<UpdateTagInStoryCommand, TagInStory>();
+            configuration.CreateMap<RemoveTagInStoryCommand, TagInStory>();
+            configuration.CreateMap<TagInStory, RemoveTagInStoryCommand>();
             #endregion
             #region Category
             configuration.CreateMap<CategoryResponse, CategoryEntities>();
@@ -77,6 +79,8 @@ namespace MuonRoiSocialNetwork.StartupConfig
             configuration.CreateMap<UpdateCategoryCommand, CategoryEntities>();
             #endregion
             #region Chapter
+            configuration.CreateMap<ChapterEntites, ChapterChunkResponse>();
+            configuration.CreateMap<ChapterChunkResponse, ChapterEntites>();
             configuration.CreateMap<ChapterModelResponse, ChapterEntites>();
             configuration.CreateMap<ChapterEntites, ChapterModelResponse>();
             configuration.CreateMap<CreateChapterCommand, ChapterEntites>();

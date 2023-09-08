@@ -6,6 +6,10 @@
         /// <summary>
         /// Tag id or story guid is not exist
         /// </summary>
-        TIS01
+        TIS01,
+        /// <summary>
+        /// Tag is a really assign to story
+        /// </summary>
+        TIS02
     }
 }

@@ -10,6 +10,10 @@ using MuonRoiSocialNetwork.Infrastructure;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Serilog;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {
@@ -17,8 +21,9 @@ namespace MuonRoiSocialNetwork.StartupConfig
     {
         public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
         {
+            /*{builder.Environment.EnvironmentName}*/
             var customAppsetting = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+            .AddJsonFile($"appsettings.Production.json", optional: true);
             var config = customAppsetting.Build();
             builder.Services.CustomAuthentication(config);
             builder.Services.CustomeAuthorization();
@@ -39,7 +44,6 @@ namespace MuonRoiSocialNetwork.StartupConfig
                 opt.UseNpgsql(config[ConstAppSettings.Instance.CONNECTIONSTRING_DB] ?? ConstAppSettings.Instance.CONNECTIONSTRING_DB, sql => sql.EnableRetryOnFailure(3));
             });
             builder.Services.Configure<SMTPConfigModel>(config.GetSection($"{NameAppSetting.SMTPCONFIG}"));
-            builder.Services.AddSignalR();
             var hangfire_connection = config[ConstAppSettings.Instance.CONNECTIONSTRING_HANGFIRE] ?? ConstAppSettings.Instance.CONNECTIONSTRING_HANGFIRE;
             builder.Services.AddHangfire(configuration => configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -56,6 +60,15 @@ namespace MuonRoiSocialNetwork.StartupConfig
                 builder.AddConsole();
                 builder.AddDebug();
             });
+            builder.Services.AddApiVersioning(opt =>
+            {
+                opt.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.ReportApiVersions = true;
+                opt.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+                                                                new HeaderApiVersionReader("x-api-version"),
+                                                                new MediaTypeApiVersionReader("x-api-version"));
+            });
             Log.Logger = new LoggerConfiguration()
                                         .WriteTo.Console()
                                         .WriteTo.File(new JsonFormatter(renderMessage: false), "Logs/ActionAPI.json")
@@ -64,6 +77,12 @@ namespace MuonRoiSocialNetwork.StartupConfig
                                                       rollingInterval: RollingInterval.Day)
                                         .MinimumLevel.Debug()
                                         .CreateLogger();
+            builder.Services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IPostConfigureOptions<JwtBearerOptions>,
+            ConfigureJwtBearerOptions>());
+            builder.Services.AddSignalR();
+            builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+            builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
             return builder;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Slugify;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -7,6 +8,7 @@ namespace BaseConfig.Extentions.String
     public static class StringManagers
     {
         private static Random _randomTemp = new(DateTime.UtcNow.Millisecond);
+        private static SlugHelper _slugHelper = new();
         public static string WithRegex(string text)
         {
             return Regex.Replace(text, @"\s+", " ");
@@ -76,5 +78,26 @@ namespace BaseConfig.Extentions.String
 
             return returnValue;
         }
+        /// <summary>
+        /// Nomarlize text after genarate text to slug
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static string NormalizeString(this string input)
+        {
+            input = input.ToLower().Replace('đ', 'd');
+            var normalizedStringBuilder = new StringBuilder();
+            foreach (char c in input.Normalize(NormalizationForm.FormD))
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    normalizedStringBuilder.Append(c);
+                }
+            }
+            return normalizedStringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+        static public string GenerateSlug(this string textString)
+       => _slugHelper.GenerateSlug(textString.NormalizeString());
     }
+
 }

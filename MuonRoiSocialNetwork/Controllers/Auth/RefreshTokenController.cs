@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MuonRoiSocialNetwork.Application.Commands.RefreshToken;
 using MuonRoiSocialNetwork.Common.Models.Logs;
+using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using Newtonsoft.Json;
 using Serilog;
@@ -17,7 +18,8 @@ namespace MuonRoiSocialNetwork.Controllers.Auth
     /// <summary>
     /// Auth: PhiLe 20230325
     /// </summary>
-    [Route("api/tokens")]
+    [ApiVersion(MainSettings.APIVersion)]
+    [Route("api/v{version:apiVersion}/tokens")]
     [ApiController]
     public class RefreshTokenController : ControllerBase
     {

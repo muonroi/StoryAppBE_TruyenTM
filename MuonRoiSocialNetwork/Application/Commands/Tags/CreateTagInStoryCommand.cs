@@ -63,13 +63,13 @@ namespace MuonRoiSocialNetwork.Application.Commands.Tags
                 #endregion
 
                 #region Check exist tag in story by name
-                MethodResult<TagInStoriesModelResponse> existTagInStory = await _tagInStoriesQueries.GetTagById(request.TagId, request.StoryId);
-                if (existTagInStory.Result == null)
+                MethodResult<TagInStoriesModelResponse> existTagInStory = await _tagInStoriesQueries.GetTagInStoriesById(request.TagId, request.StoryId);
+                if (existTagInStory.Result != null)
                 {
                     methodResult.StatusCode = StatusCodes.Status400BadRequest;
                     methodResult.AddApiErrorMessage(
-                        nameof(EnumTagInStoryErrorCode.TIS01),
-                        new[] { Helpers.GenerateErrorResult(nameof(EnumTagInStoryErrorCode.TIS01), nameof(EnumTagInStoryErrorCode.TIS01)) }
+                        nameof(EnumTagInStoryErrorCode.TIS02),
+                        new[] { Helpers.GenerateErrorResult(nameof(EnumTagInStoryErrorCode.TIS02), nameof(EnumTagInStoryErrorCode.TIS02)) }
                     );
                     methodResult.Result = false;
                     return methodResult;

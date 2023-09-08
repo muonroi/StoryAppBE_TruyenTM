@@ -34,7 +34,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.TagsAndTagInStories
         /// <param name="storyId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<MethodResult<TagInStoriesModelResponse>> GetTagById(int idTag, int storyId)
+        public async Task<MethodResult<TagInStoriesModelResponse>> GetTagInStoriesById(int idTag, int storyId)
         {
             MethodResult<TagInStoriesModelResponse> methodResult = new();
             TagInStory? tagInStoryResult = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.TagId == idTag && x.StoryId == storyId);
@@ -58,7 +58,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.TagsAndTagInStories
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        public async Task<MethodResult<List<TagInStoriesModelResponse>>> GetAllTagInStory(int pageSize, int pageIndex)
+        public async Task<MethodResult<List<TagInStoriesModelResponse>>> GetAllTagInStory(int pageIndex, int pageSize)
         {
             MethodResult<List<TagInStoriesModelResponse>> methodResult = new();
             List<TagInStory> tagInStoryResult = await _queryable.AsNoTracking().Select(x => x).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();

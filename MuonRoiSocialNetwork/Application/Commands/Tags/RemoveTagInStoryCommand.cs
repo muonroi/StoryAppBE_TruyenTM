@@ -69,7 +69,6 @@ namespace MuonRoiSocialNetwork.Application.Commands.Tags
 
                 #region Check exist TagInStory by id
                 TagInStory existTagInStory = await _tagInStoriesQueries.GetByIdAsync(request.IdTagInStory);
-                existTagInStory.Id = request.IdTagInStory;
                 if (existTagInStory == null)
                 {
                     methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -83,18 +82,8 @@ namespace MuonRoiSocialNetwork.Application.Commands.Tags
                 #endregion
 
                 #region remove TagInStory
-                await _tagInStoryRepository.DeleteAsync(newTagInStory);
-                int checkStatus = await _tagInStoryRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                if (checkStatus < 1)
-                {
-                    methodResult.StatusCode = StatusCodes.Status400BadRequest;
-                    methodResult.AddApiErrorMessage(
-                        nameof(EnumUserErrorCodes.USRC50C),
-                        new[] { Helpers.GenerateErrorResult(nameof(EnumUserErrorCodes.USRC50C), nameof(EnumUserErrorCodes.USRC50C)) }
-                    );
-                    methodResult.Result = false;
-                    return methodResult;
-                }
+                await _tagInStoryRepository.DeleteAsync(existTagInStory);
+                await _tagInStoryRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
                 #endregion
             }
             catch (CustomException ex)

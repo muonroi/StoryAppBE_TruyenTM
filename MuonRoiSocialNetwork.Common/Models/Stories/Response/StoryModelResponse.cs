@@ -7,10 +7,16 @@ namespace MuonRoiSocialNetwork.Common.Models.Stories.Response
     {
         [JsonProperty("rank_number")]
         public int RankNumber { get; set; }
-
         [JsonProperty("total_chapter")]
         public int TotalChapter { get; set; }
         [JsonProperty("total_vote")]
         public int TotalVote { get; set; }
+        [JsonProperty("first_chapter_id")]
+        public long? FirstChapterId { get; set; }
+        [JsonProperty("last_chapter_id")]
+        public long? LastChapterId { get; set; }
+        [JsonProperty("slug_author")]
+        public string? SlugAuthor { get; set; }
+
     }
 }

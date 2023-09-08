@@ -2,6 +2,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using MuonRoiSocialNetwork.Common.Settings.Appsettings;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using static IdentityModel.ClaimComparer;
+using Microsoft.AspNetCore.Identity;
+using System.Net;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {
@@ -21,17 +28,32 @@ namespace MuonRoiSocialNetwork.StartupConfig
                 IssuerSigningKey = symmetricKey,
                 ValidIssuer = myIssuer,
                 ValidAudience = myAudience,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
+                NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
             };
             services.AddAuthentication(delegate (AuthenticationOptions x)
             {
                 x.DefaultAuthenticateScheme = "Bearer";
                 x.DefaultChallengeScheme = "Bearer";
-            }).AddJwtBearer(delegate (JwtBearerOptions x)
+            }).AddIdentityServerJwt().AddJwtBearer(delegate (JwtBearerOptions x)
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = validationParameters;
+                x.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/hubs")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
             return services;
         }

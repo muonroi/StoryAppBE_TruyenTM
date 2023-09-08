@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BaseConfig.EntityObject.Entity;
 using BaseConfig.Exeptions;
+using BaseConfig.Extentions.String;
 using BaseConfig.MethodResult;
 using MediatR;
 using MuonRoi.Social_Network.Storys;
@@ -79,16 +80,11 @@ namespace MuonRoiSocialNetwork.Application.Commands.Chapter
                     return methodResult;
                 }
                 updateChapter = _mapper.Map<ChapterEntites>(request.InfoUpdate);
-                if (!updateChapter.IsValid())
-                {
-                    throw new CustomException(updateChapter.ErrorMessages);
-                }
                 updateChapter.Id = request.Id;
-                request.InfoUpdate.ChapterTitle = request.InfoUpdate.ChapterTitle.ToLower().Replace('đ', 'd');
-                string normalizedInput = NormalizeString(request.InfoUpdate.ChapterTitle);
                 char[] delimiters = new char[] { ' ', '\r', '\n' };
-                updateChapter.Slug = _slugHelper.GenerateSlug(normalizedInput);
+                updateChapter.Slug = StringManagers.GenerateSlug(request.InfoUpdate.ChapterTitle);
                 updateChapter.NumberOfWord = updateChapter.Body.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
+
                 if (!updateChapter.IsValid())
                 {
                     throw new CustomException(updateChapter.ErrorMessages);
