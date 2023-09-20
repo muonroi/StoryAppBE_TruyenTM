@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MuonRoiSocialNetwork.Common.Models.Stories.Response
+namespace MuonRoiSocialNetwork.Common.Models.Stories.Response.Dto
 {
     public class StoryRattings
     {

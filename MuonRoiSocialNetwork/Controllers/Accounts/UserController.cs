@@ -445,17 +445,18 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
         /// </summary>
         /// <returns></returns>
         [HttpPatch("group")]
-        [Authorize(Policy = nameof(RoleSettings.MOD))]
+        [Authorize(Policy = nameof(RoleSettings.SU))]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> AssignUserToGroup([FromQuery] int groupId)
+        public async Task<IActionResult> AssignUserToGroup([FromBody] int groupId, Guid userGuid)
         {
             try
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 AssignUserToGroupCommand cmd = new()
                 {
-                    GroupId = groupId
+                    GroupId = groupId,
+                    UserGuid = userGuid
                 };
                 MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
                 stopwatch.Stop();

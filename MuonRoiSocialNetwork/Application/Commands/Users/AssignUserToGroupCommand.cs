@@ -29,6 +29,10 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
         /// Group id
         /// </summary>
         public int GroupId { get; set; }
+        /// <summary>
+        /// User guid
+        /// </summary>
+        public Guid UserGuid { get; set; }
     }
     /// <summary>
     /// Assign user handler
@@ -80,7 +84,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
                 #endregion
 
                 #region Check is exist user
-                MethodResult<BaseUserResponse> baseUserResponse = await _userQueries.GetUserModelByGuidAsync(Guid.Parse(_authContext.CurrentUserId));
+                MethodResult<BaseUserResponse> baseUserResponse = await _userQueries.GetUserModelByGuidAsync(request.UserGuid);
                 if (baseUserResponse.Result is null)
                 {
                     methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -119,7 +123,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
                     NotificationContent = $"{infoUser.Name}",
                     TimeCreated = DateTime.Now.ToString("MM/dd"),
                     Url = infoUser.Avatar ?? string.Empty,
-                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.global
+                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.Global
                 }, cancellationToken: cancellationToken);
                 #endregion
                 methodResult.Result = true;

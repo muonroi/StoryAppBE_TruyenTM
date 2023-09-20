@@ -7,14 +7,14 @@ namespace MuonRoi.Social_Network.Configurations.Users
     /// <summary>
     /// Configuration BookMarkStory
     /// </summary>
-    public class BookMarkStoryConfiguration : IEntityTypeConfiguration<BookMarkStory>
+    public class BookMarkStoryConfiguration : IEntityTypeConfiguration<BookmarkStory>
     {
         /// <summary>
         /// Configuration BookMarkStory
         /// </summary>
-        public void Configure(EntityTypeBuilder<BookMarkStory> builder)
+        public void Configure(EntityTypeBuilder<BookmarkStory> builder)
         {
-            builder.ToTable(nameof(BookMarkStory).ToLower());
+            builder.ToTable(nameof(BookmarkStory).ToLower());
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
             builder.HasOne(x => x.UserMember)

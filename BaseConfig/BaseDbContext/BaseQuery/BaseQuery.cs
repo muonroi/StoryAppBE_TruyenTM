@@ -13,7 +13,7 @@ namespace BaseConfig.BaseDbContext.BaseQuery
 
         protected readonly BaseDbContext _dbBaseContext;
 
-        private readonly AuthContext _authContext;
+        protected readonly AuthContext _authContext;
 
         protected readonly DbSet<T> _dbSet;
 

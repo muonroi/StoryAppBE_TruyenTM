@@ -17,6 +17,7 @@ namespace MuonRoiSocialNetwork.Common.Models.Stories.Response
         public long? LastChapterId { get; set; }
         [JsonProperty("slug_author")]
         public string? SlugAuthor { get; set; }
-
+        [JsonProperty("is_bookmark")]
+        public bool? IsBookmark { get; set; }
     }
 }

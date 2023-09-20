@@ -11,6 +11,7 @@ using MuonRoi.Social_Network.Storys;
 using MuonRoi.Social_Network.Tags;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request.Search;
 using MuonRoiSocialNetwork.Common.Models.Stories.Response;
+using MuonRoiSocialNetwork.Common.Models.Stories.Response.Dto;
 using MuonRoiSocialNetwork.Common.Models.Tuples;
 using MuonRoiSocialNetwork.Common.Settings.StorySettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Category;
@@ -19,7 +20,6 @@ using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.TagsAndTagInStories;
 using MuonRoiSocialNetwork.Infrastructure.Helpers;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using CategoryEntities = MuonRoi.Social_Network.Categories.Category;
 namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
 {
@@ -33,6 +33,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
         private readonly ITagQueries _tagQueries;
         private readonly IConfiguration _configuration;
         private readonly IChapterQueries _chapterQueries;
+        private readonly IBookmarkStoryQueries _bookmarkQueries;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -45,14 +46,16 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
         /// <param name="cache"></param>
         /// <param name="configuration"></param>
         /// <param name="chapterQueries"></param>
+        /// <param name="bookmarkQueries"></param>
         public StoriesQueries(MuonRoiSocialNetworkDbContext dbContext, AuthContext authContext, IMapper mapper, ITagInStoriesQueries tagInStoriesQueries, ICategoryQueries categoryQueries, ITagQueries tagQueries, IDistributedCache cache, IConfiguration configuration,
-            IChapterQueries chapterQueries) : base(dbContext, authContext, cache, mapper)
+            IChapterQueries chapterQueries, IBookmarkStoryQueries bookmarkQueries) : base(dbContext, authContext, cache, mapper)
         {
             _tagInStoriesQueries = tagInStoriesQueries;
             _categoryQueries = categoryQueries;
             _tagQueries = tagQueries;
             _configuration = configuration;
             _chapterQueries = chapterQueries;
+            _bookmarkQueries = bookmarkQueries;
         }
         /// <summary>
         /// Search story
@@ -250,6 +253,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
         /// <returns></returns>
         public async Task<MethodResult<StoryModelResponse>> GetStoryAsync(int storyId)
         {
+
             MethodResult<StoryModelResponse> methodResult = new();
             var checkStatus = await IsCacheExistAsync();
             if (checkStatus is null || checkStatus.Status)
@@ -282,7 +286,11 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
             CategoryEntities? categoryOfStorys = (from categorys in checkStatus.Categories ?? await _categoryQueries.GetAllAsync().ConfigureAwait(false)
                                                   where !categorys.IsDeleted && categorys.Id == querySearch.CategoryId
                                                   select categorys).FirstOrDefault();
+            _authContext.CurrentUserId = string.IsNullOrEmpty(_authContext.CurrentUserId) ? Guid.NewGuid().ToString() : _authContext.CurrentUserId;
+            var bookmarkResult = await _bookmarkQueries.ExistBookmarkStoryOfUser(resultStories.Guid, new Guid(_authContext.CurrentUserId));
+
             SetMoreVariableStory(ref resultStories, tagOfStory.Select(x => x.tagsSingle.TagName).ToList(), categoryOfStorys == null ? string.Empty : categoryOfStorys.NameCategory ?? string.Empty, JsonConvert.DeserializeObject<StoryRattings>(querySearch.ListRattings)?.Data.Count ?? 0, firstAndLastChapter?.Result?.Keys?.FirstOrDefault() ?? 0, firstAndLastChapter?.Result?.Values?.FirstOrDefault() ?? 0);
+            resultStories.IsBookmark = bookmarkResult.Result != null;
             methodResult.Result = resultStories;
 
             return methodResult;

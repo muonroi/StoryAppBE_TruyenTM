@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Application.Commands.Base.Stories;
 using MuonRoiSocialNetwork.Common.Models.Notifications;
-using MuonRoiSocialNetwork.Common.Models.Stories.Response;
+using MuonRoiSocialNetwork.Common.Models.Stories.Response.Dto;
 using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
@@ -94,6 +94,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                     return methodResult;
                 }
                 #endregion
+
                 #region Pushlish
                 storyRattings = JsonConvert.DeserializeObject<StoryRattings>(existStory.ListRattings) ?? new()
                 {
@@ -116,8 +117,9 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #region Send notification to user favorite
                 await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new NotificationModels
                 {
-                    NotificationContent = $"Your story {existStory.StoryTitle} have new vote: {storyRattings.Data.Average(x => x.RattingValues)}",
-                    TimeCreated = DateTime.Now.ToString("MM/dd")
+                    NotificationContent = $"{existStory.StoryTitle}-{_authContext.CurrentNameUser}-{storyRattings.Data.Average(x => x.RattingValues)}",
+                    TimeCreated = DateTime.Now.ToString("MM/dd"),
+                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.VoteStory
                 }, existStory.CreatedUserGuid, cancellationToken: cancellationToken);
                 #endregion
             }

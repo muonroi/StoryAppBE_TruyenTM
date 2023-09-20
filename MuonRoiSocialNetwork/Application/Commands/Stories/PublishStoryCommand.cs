@@ -13,6 +13,7 @@ using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace MuonRoiSocialNetwork.Application.Commands.Stories
@@ -90,14 +91,13 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Send notification to user favorite
-
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, StringManagers.GenerateSlug(existStory.AuthorName))).SendAsync(GroupHelperConst.Instance.StreamNameFavorite, new NotificationModels
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, StringManagers.GenerateSlug(existStory.AuthorName))).SendAsync(GroupHelperConst.Instance.StreamNameFavorite, JsonConvert.SerializeObject(new NotificationModels
                 {
-                    NotificationContent = $"{existStory.StoryTitle}",
+                    NotificationContent = $"{existStory.StoryTitle}-{existStory.AuthorName}",
                     TimeCreated = DateTime.Now.ToString("MM/dd"),
                     Url = existStory.ImgUrl,
-                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.storyFavorite
-                }, cancellationToken: cancellationToken);
+                    Type = Common.Settings.SignalRSettings.Enum.NotificationType.StoryFavorite
+                }), cancellationToken: cancellationToken);
                 #endregion
             }
             catch (Exception ex)

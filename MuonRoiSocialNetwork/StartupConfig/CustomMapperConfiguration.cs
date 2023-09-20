@@ -59,6 +59,8 @@ namespace MuonRoiSocialNetwork.StartupConfig
             configuration.CreateMap<StoryModelRequest, Story>();
             configuration.CreateMap<CommentStoryCommand, StoryReview>();
             configuration.CreateMap<StoryReviewModelRequest, StoryReview>();
+            configuration.CreateMap<BookmarkStoryModelResponse, BookmarkStory>();
+            configuration.CreateMap<BookmarkStory, BookmarkStoryModelResponse>();
             #endregion
             #region Tag
             configuration.CreateMap<TagModelResponse, Tag>();
