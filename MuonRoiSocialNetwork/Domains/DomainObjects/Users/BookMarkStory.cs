@@ -8,7 +8,7 @@ namespace MuonRoi.Social_Network.Users
     /// <summary>
     /// Table Bookmark
     /// </summary>
-    public class BookMarkStory : Entity
+    public class BookmarkStory : Entity
     {
         /// <summary>
         /// Story Guid

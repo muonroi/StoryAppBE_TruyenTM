@@ -169,7 +169,7 @@ namespace MuonRoi.Social_Network.Users
         /// <summary>
         /// Foreign key
         /// </summary>
-        public List<BookMarkStory>? BookMarkStory { get; set; }
+        public List<BookmarkStory>? BookMarkStory { get; set; }
         /// <summary>
         /// Foreign key
         /// </summary>

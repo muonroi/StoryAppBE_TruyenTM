@@ -23,7 +23,7 @@ namespace BaseConfig.JWT
             DateTime now = DateTime.UtcNow;
             var claims = new List<Claim>
             {
-                new Claim("name_user", user.Name ?? ""),
+                new Claim("name_user", $"{user.Surname} {user.Name }" ?? ""),
                 new Claim("username", user.Username ?? ""),
                 new Claim("user_id", user.Id.ToString()),
                 new Claim("email", user.Email ?? ""),
@@ -44,7 +44,7 @@ namespace BaseConfig.JWT
             SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = now.AddMinutes(expiresTime),
+                Expires = now.AddDays(expiresTime),
                 Issuer = myIssuer,
                 Audience = myAudience,
                 SigningCredentials = new SigningCredentials(symmetricKey,

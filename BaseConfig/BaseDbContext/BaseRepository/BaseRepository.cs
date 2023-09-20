@@ -65,7 +65,7 @@ namespace BaseConfig.BaseDbContext.BaseRepository
                 newEntity.UpdatedDateTS = utcNow.GetTimeStamp(includedTimeValue: true);
                 newEntity.CreatedUserName = _authContext.CurrentUsername;
                 newEntity.UpdatedUserName = _authContext.CurrentUsername;
-                newEntity.UpdatedUserGuid = new Guid(_authContext.Guid);
+                newEntity.UpdatedUserGuid = new Guid(_authContext.CurrentUserId);
                 newEntity.Guid = Guid.NewGuid();
                 newEntity.AddDomainEvent(new EntityCreatedEvent<T>(newEntity));
                 _dbBaseContext.TrackEntity(newEntity);

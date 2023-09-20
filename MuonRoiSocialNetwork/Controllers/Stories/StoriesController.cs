@@ -471,6 +471,50 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                 return errCommandResult.GetActionResult();
             }
         }
+        /// <summary>
+        /// Create bookmark to story API
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("bookmark")]
+        [Authorize(Policy = nameof(RoleSettings.VIEWER))]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> BookmarkStory([FromBody] BookmarkStoryCommand cmd)
+        {
+            try
+            {
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Delete bookmark to story API
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("bookmark")]
+        [Authorize(Policy = nameof(RoleSettings.VIEWER))]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> BookmarkStory([FromBody] DeleteBookmarkStoryCommand cmd)
+        {
+            try
+            {
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
         #endregion
 
         #region Queries
@@ -501,7 +545,7 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         /// </summary>  
         /// <returns></returns>
         [HttpGet("single")]
-        [AllowAnonymous]
+        [Authorize(Policy = nameof(RoleSettings.VIEWER))]
         [ProducesResponseType(typeof(MethodResult<StoryModelResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetStoryByGuid([FromQuery] int storyId)

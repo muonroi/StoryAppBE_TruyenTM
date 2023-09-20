@@ -39,7 +39,7 @@
         /// <summary>
         /// Expiry time life of access token
         /// </summary>
-        public readonly int minuteExpitryLogin = 15;
+        public readonly int minuteExpitryLogin = 365;
         /// <summary>
         /// Expiry time life of token email
         /// </summary>

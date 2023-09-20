@@ -63,15 +63,15 @@ namespace MuonRoiSocialNetwork.Infrastructure
           .HasForeignKey(x => x.GroupId);
             //Index
             builder.Entity<Story>()
-                .HasIndex(x => new { x.StoryTitle, x.AuthorName });
+                .HasIndex(x => new { x.StoryTitle, x.AuthorName, x.Id, x.Guid, x.CategoryId });
             builder.Entity<Category>()
-                .HasIndex(x => new { x.NameCategory });
+                .HasIndex(x => new { x.Id, x.Guid, x.NameCategory });
             builder.Entity<AppUser>()
-                .HasIndex(x => new { x.UserName });
+                .HasIndex(x => new { x.UserName, x.Id });
             builder.Entity<Chapter>()
-                .HasIndex(x => new { x.ChapterTitle, x.NumberOfChapter });
+                .HasIndex(x => new { x.ChapterTitle, x.NumberOfChapter, x.Id, x.Guid });
             builder.Entity<Tag>()
-               .HasIndex(x => new { x.TagName });
+               .HasIndex(x => new { x.TagName, x.Id, x.Guid });
             base.OnModelCreating(builder);
 
         }
@@ -122,7 +122,7 @@ namespace MuonRoiSocialNetwork.Infrastructure
         /// <summary>
         /// BookMarkStories
         /// </summary>
-        public DbSet<BookMarkStory>? BookMarkStories { get; set; }
+        public DbSet<BookmarkStory>? BookMarkStories { get; set; }
         /// <summary>
         /// FollowingAuthors
         /// </summary>
