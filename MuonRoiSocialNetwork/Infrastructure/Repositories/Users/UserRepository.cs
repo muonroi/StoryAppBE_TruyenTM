@@ -125,6 +125,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Repositories.Users
         {
             try
             {
+                using var context = _dbcontext;
                 DateTime utcNow = DateTime.UtcNow;
                 user.UpdatedDateTS = utcNow.GetTimeStamp(includedTimeValue: true);
                 if (salt is not null && passwordHash is not null)
@@ -132,13 +133,9 @@ namespace MuonRoiSocialNetwork.Infrastructure.Repositories.Users
                     user.Salt = salt;
                     user.PasswordHash = passwordHash;
                 }
-                var userUpdate = await _dbcontext.AppUsers.FirstOrDefaultAsync(x => x.Id == user.Id);
-                if (userUpdate != null)
-                {
-                    userUpdate.GroupId = user.GroupId;
-                    _dbcontext.AppUsers.Update(userUpdate);
-                }
+                _dbcontext.AppUsers.Update(user);
                 await _dbcontext.SaveChangesAsync();
+
             }
             catch (Exception ex)
             {

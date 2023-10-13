@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MuonRoiSocialNetwork.Application.Commands.Stories;
 using MuonRoiSocialNetwork.Common.Models.Logs;
+using MuonRoiSocialNetwork.Common.Models.Notifications;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request.Search;
 using MuonRoiSocialNetwork.Common.Models.Stories.Response;
@@ -35,6 +36,7 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         private readonly IMediator _mediator;
         private readonly IStoriesQueries _storiesQueries;
         private readonly IReviewStoryQueries _reviewStoryQueries;
+        private readonly IStoryNotificationQueries _storyNotificationQueries;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -43,13 +45,15 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         /// <param name="auth"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="reviewStoryQueries"></param>
-        public StoriesController(IMediator mediator, IStoriesQueries storiesQueries, AuthContext auth, IHttpContextAccessor httpContextAccessor, IReviewStoryQueries reviewStoryQueries)
+        /// <param name="storyNotificationQueries"></param>
+        public StoriesController(IMediator mediator, IStoriesQueries storiesQueries, AuthContext auth, IHttpContextAccessor httpContextAccessor, IReviewStoryQueries reviewStoryQueries, IStoryNotificationQueries storyNotificationQueries)
         {
             _auth = auth;
             _httpContextAccessor = httpContextAccessor;
             _mediator = mediator;
             _storiesQueries = storiesQueries;
             _reviewStoryQueries = reviewStoryQueries;
+            _storyNotificationQueries = storyNotificationQueries;
         }
         #region Repository
         /// <summary>
@@ -72,6 +76,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(InitialNewStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -115,6 +121,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(EditStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -158,6 +166,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(RemoveStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -201,6 +211,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(PublishStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -244,6 +256,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(SetNumberViewOfStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -287,6 +301,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(VoteOfStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -330,6 +346,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(FavoriteOfStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -373,6 +391,8 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(StoriesController),
                     ApiName = nameof(CategoryOfStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -408,11 +428,34 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 MethodResult<StoryReviewModelResponse> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(CommentStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
             {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
                 var errCommandResult = new VoidMethodResult();
                 errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
                 return errCommandResult.GetActionResult();
@@ -430,16 +473,39 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 UpdateCommentStoryCommand cmd = new()
                 {
                     IdComment = idComment,
                     StoryReviewModelRequest = storyReviewModelRequest
                 };
                 MethodResult<StoryReviewModelResponse> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(UpdateCommentStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
             {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
                 var errCommandResult = new VoidMethodResult();
                 errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
                 return errCommandResult.GetActionResult();
@@ -457,15 +523,38 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 RemoveCommentStoryCommand cmd = new()
                 {
                     IdCommentStory = idComment,
                 };
                 MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(RemoveCommentStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
             {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
                 var errCommandResult = new VoidMethodResult();
                 errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
                 return errCommandResult.GetActionResult();
@@ -483,11 +572,34 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(BookmarkStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
             {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
                 var errCommandResult = new VoidMethodResult();
                 errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
                 return errCommandResult.GetActionResult();
@@ -505,18 +617,216 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(BookmarkStory),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
             {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Delete signle notification of user API
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("notification/single")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> DeleteSignleNotification([FromBody] DeleteSignleNotificationCommand cmd)
+        {
+            try
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(DeleteSignleNotification),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Delete all notification of user API
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("notification/all")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> DeleteAllNotification([FromBody] DeleteAllNotificationCommand cmd)
+        {
+            try
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(DeleteAllNotification),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Set single notification to seen of user API
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("notification")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> SetSingleNotificationToSeen([FromBody] SetSingleNotificationToSeenCommand cmd)
+        {
+            try
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(SetSingleNotificationToSeen),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Set all notification to seen of user API
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("notification/all")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> SetAllNotificationToSeen([FromBody] SetAllNotificationToSeenCommand cmd)
+        {
+            try
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                MethodResult<bool> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(StoriesController),
+                    ApiName = nameof(SetSingleNotificationToSeen),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
                 var errCommandResult = new VoidMethodResult();
                 errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
                 return errCommandResult.GetActionResult();
             }
         }
         #endregion
-
         #region Queries
         /// <summary>
         /// Get all story API
@@ -635,7 +945,27 @@ namespace MuonRoiSocialNetwork.Controllers.Stories
                 return errCommandResult.GetActionResult();
             }
         }
-
+        /// <summary>
+        /// Notification story for user API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("notification/user")]
+        [ProducesResponseType(typeof(MethodResult<PagingItemsDTO<NotificationModels>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> NotificationForUser([FromQuery] int pageIndex = 1, int pageSize = 10)
+        {
+            try
+            {
+                MethodResult<PagingItemsDTO<NotificationModels>> methodResult = await _storyNotificationQueries.GetNotifycationByUserGuid(pageIndex, pageSize).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
         #endregion
     }
 }

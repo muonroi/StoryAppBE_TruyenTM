@@ -76,6 +76,10 @@ namespace MuonRoiSocialNetwork.Common.Settings.StorySettings
         /// </summary>
         public readonly string keyModelResponseTotalChaptersPagingByStory = "ModelResponseTotalChaptersPagingByStory-{0}-{1}{2}";
         /// <summary>
+        /// Key group chapter by storyId
+        /// </summary>
+        public readonly string keyModelGroupChaptersByStory = "ModelGroupChaptersByStory-{0}";
+        /// <summary>
         /// Life time expiration
         /// </summary>
         public readonly TimeSpan expirationTimeModelAllStories = TimeSpan.FromDays(1);

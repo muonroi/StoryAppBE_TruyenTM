@@ -1,4 +1,51 @@
 {
+  //--------------------\
+  //Chapter
+  "CT00": "Tiêu đề chương không được để trống",
+  "CT01": "Tiêu đề chương vượt quá kí tự quy định (255)",
+  "CT02": "Tiêu đề chương phải từ 3 kí tự trở lên",
+  "CT04": "Nội dung truyện không được trống",
+  "CT05": "Nội dung truyện vượt quá kí tự quy định (100000)",
+  "CT06": "Nội dung truyện phải từ 750 kí tự trở lên",
+  "CT07": "Số chương không được để trống",
+  "CT08": "Số chương vượt quá kí tự quy định 200",
+  "CT09": "Số chữ trong truyện không được trống",
+  "CT10": "Đường dẫn chương truyện",
+  "CT11": "Chương không tồn tại",
+  //--------------------\
+  //Category
+  "CTS00": "Tên danh mục không được trống",
+  "CTS01": "Vui lòng chọn danh mục",
+  "CTS02": "Danh mục không tồn tại",
+  "CTS03": "Số lượng phải nhỏ hơn 100",
+  "CTS04": "Tên danh mục đã tồn tại",
+  //--------------------\
+  //Group
+  "GRP01C": "Tên nhóm không được bỏ trống",
+  "GRP02C": "Mô tả nhóm không được quá 500 kí tự",
+  "GRP04C": "Nhóm không tồn tại",
+  "GRP06C": "Tên nhóm không quá 100 kí tự",
+  "GRP09C": "Mã nhóm không được trống",
+  "GRP10C": "Mã nhóm không quá 100 kí tự",
+  "GRP13C": "Nhóm đã tồn tại",
+  // --------------------\
+  //Story notification
+  "NT00": "Đường dẫn thông báo không được trống",
+  "NT01": "Độ dài tối đa của đường dẫn là 1000 kí tự",
+  "NT02": "Tiêu đề không được để trống",
+  "NT03": "Tiêu đề vượt quá kí tự quy định 200 kí tự",
+  "NT04": "Nội dung không được để trống",
+  "NT05": "Nội dung vượt quá kí tự quy định 350 kí tự",
+  "NT06": "Không có thông báo",
+  //--------------------\
+  //Role
+  "ROL01C": "Danh sách quyền không được null",
+  "ROL02C": "Quyền không tồn tại",
+  "ROL03C": "Tên quyền không đúng",
+  "ROL04C": "Tên quyền bắt buộc nhập",
+  "ROL05C": "Tên quyền tối đa 100 kí tự",
+  "ROL06C": "Mô tả quyền không quá 1000 kí tự",
+  "ROL07C": "Tên quyền đã tồn tại",
   //Story
   "ST00": "Tiêu đề truyện không được để trống",
   "ST01": "Tiêu đề truyện vượt quá kí tự tối đa (255)",
@@ -16,17 +63,11 @@
   "ST13": "Cập nhật lượt xem không thành công",
   "ST14": "Truyện đã được thích",
   "ST15": "Nội dung cập nhật trống",
+  //--------------------\
+  //Tag in story
+  "TIS01": "Không tìm thấy dữ liệu",
+  "TIS02": "danh mục đã thuộc truyện",
   // --------------------\
-
-  //Story notification
-  "NT00": "Đường dẫn thông báo không được trống",
-  "NT01": "Độ dài tối đa của đường dẫn là 1000 kí tự",
-  "NT02": "Tiêu đề không được để trống",
-  "NT03": "Tiêu đề vượt quá kí tự quy định 200 kí tự",
-  "NT04": "Nội dung không được để trống",
-  "NT05": "Nội dung vượt quá kí tự quy định 350 kí tự",
-  // --------------------\
-
   //Tag
   "TT00": "Tên thẻ không được trống",
   "TT01": "Tên thẻ quá dài (nhỏ hơn hoặc bằng 50 kí tự)",
@@ -45,20 +86,20 @@
   "USR01C": "Mật khẩu không hợp lệ",
   "USR02C": "Tài khoản không tồn tại",
   "USR03C": "Tên người dùng bắt buộc phải nhập",
-  "USR08C": "Tên người dùng tối đa 100 kí tự",
   "USR04C": "Họ và tên đệm bắt buộc phải nhập",
-  "USR09C": "Họ và tên đệm tối đa 100 kí tự",
   "USR05C": "Tài khoản bắt buộc phải nhập",
-  "USR10C": "Tài khoản tối đa 100 kí tự",
   "USR06C": "Mật khẩu bắt buộc phải nhập",
-  "USR11C": "Mật khẩu tối đa 1000",
   "USR07C": "Key mã hóa bắt buộc phải nhập",
+  "USR08C": "Tên người dùng tối đa 100 kí tự",
+  "USR09C": "Họ và tên đệm tối đa 100 kí tự",
+  "USR10C": "Tài khoản tối đa 100 kí tự",
+  "USR11C": "Mật khẩu tối đa 1000",
   "USR12C": "Key mã hóa tối đa 1000 kí tự",
   "USR13C": "Tài khoản đã tồn tại",
   "USR14C": "Tài khoản chỉ cho phép [a-z,A-Z,0-9,_]",
   "USR15C": "Tài khoản tối thiểu 4 kí tự",
-  "USR17C": "• Ít nhất một chữ cái viết hoa • ít nhất một chữ cái viết thường • Ít nhất một chữ số • Ít nhất một ký tự đặc biệt",
   "USR16C": "Tài khoản tối thiểu 8 kí tự",
+  "USR17C": "• Ít nhất một chữ cái viết hoa • ít nhất một chữ cái viết thường • Ít nhất một chữ số • Ít nhất một ký tự đặc biệt",
   "USR18C": "Địa chỉ không quá 1000 kí tự",
   "USR19C": "Email không đúng định dạng",
   "USR20C": "Email không quá 1000 kí tự",
@@ -93,54 +134,5 @@
   "USRC49C": "Định dạng đầu vào không hợp lệ",
   "USRC50C": "Cập nhật thất bại vui lòng liên hệ đội ngũ phát triển",
   "USRC51C": "Thêm thất bại vui lòng liên hệ đội ngũ phát triển",
-  "USRC52C": "Xoá thất bại vui lòng liên hệ đội ngũ phát triển",
-  //--------------------\
-
-  //Role
-  "ROL01C": "Danh sách quyền không được null",
-  "ROL02C": "Quyền không tồn tại",
-  "ROL03C": "Tên quyền không đúng",
-  "ROL04C": "Tên quyền bắt buộc nhập",
-  "ROL05C": "Tên quyền tối đa 100 kí tự",
-  "ROL06C": "Mô tả quyền không quá 1000 kí tự",
-  "ROL07C": "Tên quyền đã tồn tại",
-  //--------------------\
-
-  //Group
-  "GRP01C": "Tên nhóm không được bỏ trống",
-  "GRP02C": "Mô tả nhóm không được quá 500 kí tự",
-  "GRP04C": "Nhóm không tồn tại",
-  "GRP06C": "Tên nhóm không quá 100 kí tự",
-  "GRP09C": "Mã nhóm không được trống",
-  "GRP10C": "Mã nhóm không quá 100 kí tự",
-  "GRP13C": "Nhóm đã tồn tại",
-  //--------------------\
-
-
-  //Chapter
-  "CT00": "Tiêu đề chương không được để trống",
-  "CT01": "Tiêu đề chương vượt quá kí tự quy định (255)",
-  "CT02": "Tiêu đề chương phải từ 3 kí tự trở lên",
-  "CT04": "Nội dung truyện không được trống",
-  "CT05": "Nội dung truyện vượt quá kí tự quy định (100000)",
-  "CT06": "Nội dung truyện phải từ 750 kí tự trở lên",
-  "CT07": "Số chương không được để trống",
-  "CT08": "Số chương vượt quá kí tự quy định 200",
-  "CT09": "Số chữ trong truyện không được trống",
-  "CT10": "Đường dẫn chương truyện",
-  "CT11": "Chương không tồn tại",
-  //--------------------\
-
-  //Category
-  "CTS00": "Tên danh mục không được trống",
-  "CTS01": "Vui lòng chọn danh mục",
-  "CTS02": "Danh mục không tồn tại",
-  "CTS03": "Số lượng phải nhỏ hơn 100",
-  "CTS04": "Tên danh mục đã tồn tại",
-  //--------------------\
-
-  //Tag in story
-  "TIS01": "Không tìm thấy dữ liệu",
-  "TIS02": "danh mục đã thuộc truyện"
-  //--------------------\
+  "USRC52C": "Xoá thất bại vui lòng liên hệ đội ngũ phát triển"
 }

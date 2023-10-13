@@ -27,6 +27,8 @@ using MuonRoiSocialNetwork.Domains.Interfaces.Queries.GroupAndRoles;
 using BaseConfig.Infrashtructure;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Auth;
 using BaseConfig.Extentions.String;
+using BaseConfig.Extentions.Image;
+using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 
 namespace MuonRoiSocialNetwork.Application.Commands.Users
 {
@@ -60,6 +62,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
         private readonly IRoleQueries _roleQueries;
         private readonly IGroupQueries _groupQueries;
         private readonly IRefreshTokenQueries _refreshTokenQueries;
+        private readonly IStoryNotificationRepository _storyNotificationsRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -75,13 +78,15 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
         /// <param name="groupQueries"></param>
         /// <param name="authContext"></param>
         /// <param name="refreshTokenQueries"></param>
+        /// <param name="storyNotificationsRepository"></param>
+
         public AuthUserCommandHandler(IMapper mapper,
             IUserRepository userRepository,
             IUserQueries userQueries,
             IConfiguration configuration,
             ILoggerFactory logger,
             IMediator mediator, IDistributedCache cache, IHttpContextAccessor httpContextAccessor, IRoleQueries roleQueries, IGroupQueries groupQueries, AuthContext authContext,
-            IRefreshTokenQueries refreshTokenQueries) : base(mapper, configuration, userQueries, userRepository, authContext)
+            IRefreshTokenQueries refreshTokenQueries, IStoryNotificationRepository storyNotificationsRepository) : base(mapper, configuration, userQueries, userRepository, authContext)
         {
             _httpContextAccessor = httpContextAccessor;
             _logger = logger.CreateLogger<AuthUserCommandHandler>();
@@ -90,6 +95,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
             _roleQueries = roleQueries;
             _groupQueries = groupQueries;
             _refreshTokenQueries = refreshTokenQueries;
+            _storyNotificationsRepository = storyNotificationsRepository;
         }
         /// <summary>
         /// Handler function
@@ -253,6 +259,9 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
                 var refreshTokenFormat = refreshToken.Result ?? StringManagers.EncodeTo64(allRefreshToken.FirstOrDefault(x => x.UserId == resultInforLoginUser.Id)?.RefreshToken ?? string.Empty);
                 resultInforLoginUser.RefreshToken = userGet?.RefreshToken ?? refreshTokenFormat;
                 resultInforLoginUser.LocationUserLogin = dataLocationOfUser != null ? JsonConvert.DeserializeObject<LocationUserLogin>(isUserExistResult.Result.LastLoginLocation ?? string.Empty) : null;
+                resultInforLoginUser.Avatar = HandlerImages.TakeLinkImage(_configuration, resultInforLoginUser.Avatar ?? "");
+                var notificationNumber = await _storyNotificationsRepository.GetWhereAsync(x => x.UserGuid == resultInforLoginUser.Id);
+                resultInforLoginUser.NotificationNumber = notificationNumber != null ? notificationNumber.Count() : 0;
                 methodResult.Result = resultInforLoginUser;
                 methodResult.StatusCode = StatusCodes.Status200OK;
                 return methodResult;

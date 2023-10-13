@@ -29,32 +29,31 @@ namespace MuonRoiSocialNetwork.StartupConfig
                 ValidIssuer = myIssuer,
                 ValidAudience = myAudience,
                 ClockSkew = TimeSpan.Zero,
-                NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
             };
             services.AddAuthentication(delegate (AuthenticationOptions x)
             {
                 x.DefaultAuthenticateScheme = "Bearer";
                 x.DefaultChallengeScheme = "Bearer";
-            }).AddIdentityServerJwt().AddJwtBearer(delegate (JwtBearerOptions x)
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = validationParameters;
-                x.Events = new JwtBearerEvents
+            }).AddJwtBearer(delegate (JwtBearerOptions x)
                 {
-                    OnMessageReceived = context =>
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = validationParameters;
+                    x.Events = new JwtBearerEvents
                     {
-                        var accessToken = context.Request.Query["access_token"];
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hubs")))
+                        OnMessageReceived = context =>
                         {
-                            context.Token = accessToken;
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hubs")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    };
+                });
             return services;
         }
     }

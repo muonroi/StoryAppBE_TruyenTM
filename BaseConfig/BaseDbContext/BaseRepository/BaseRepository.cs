@@ -55,7 +55,19 @@ namespace BaseConfig.BaseDbContext.BaseRepository
                 throw;
             }
         }
+        public async Task<IEnumerable<T>> GetWhereAsync(Func<T, bool> predicate)
+        {
+            try
+            {
+                var result = _dbSet.AsNoTracking().Where(predicate).Select(x => x);
+                return await Task.FromResult(result);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
+        }
         public virtual T Add(T newEntity)
         {
             try

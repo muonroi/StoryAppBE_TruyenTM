@@ -13,6 +13,7 @@ using MuonRoiSocialNetwork.Common.Models.Category.Response;
 using MuonRoiSocialNetwork.Common.Models.Chapter.Request;
 using MuonRoiSocialNetwork.Common.Models.Chapter.Response;
 using MuonRoiSocialNetwork.Common.Models.GroupAndRoles.Base.Response;
+using MuonRoiSocialNetwork.Common.Models.Notifications;
 using MuonRoiSocialNetwork.Common.Models.Stories.Request;
 using MuonRoiSocialNetwork.Common.Models.Stories.Response;
 using MuonRoiSocialNetwork.Common.Models.TagInStories.Response;
@@ -36,14 +37,11 @@ namespace MuonRoiSocialNetwork.StartupConfig
             configuration.CreateMap<AppUser, UserModelRequest>();
             configuration.CreateMap<CreateUserCommand, AppUser>();
             configuration.CreateMap<AppUser, UserModelResponse>();
-            configuration.CreateMap<AppUser, UpdateInformationCommand>();
-            configuration.CreateMap<UpdateInformationCommand, AppUser>();
-            configuration.CreateMap<BaseUserResponse, AppUser>();
-            configuration.CreateMap<AppUser, BaseUserResponse>();
-            configuration.CreateMap<AppUser, ChangePasswordCommand>();
-            configuration.CreateMap<AppUser, ChangeStatusCommand>();
-            configuration.CreateMap<ChangeStatusCommand, AppUser>();
-            configuration.CreateMap<ChangePasswordCommand, AppUser>();
+            configuration.CreateMap<AppUser, UpdateInformationCommand>().ReverseMap();
+            configuration.CreateMap<UpdateInformationCommand, AppUser>().ReverseMap();
+            configuration.CreateMap<AppUser, BaseUserResponse>().ReverseMap();
+            configuration.CreateMap<AppUser, ChangePasswordCommand>().ReverseMap();
+            configuration.CreateMap<AppUser, ChangeStatusCommand>().ReverseMap();
             configuration.CreateMap<BaseUserResponse, UserModelResponse>();
             configuration.CreateMap<UserModelRequest, CreateUserCommand>();
             configuration.CreateMap<CreateUserCommand, UserModelRequest>();
@@ -59,32 +57,27 @@ namespace MuonRoiSocialNetwork.StartupConfig
             configuration.CreateMap<StoryModelRequest, Story>();
             configuration.CreateMap<CommentStoryCommand, StoryReview>();
             configuration.CreateMap<StoryReviewModelRequest, StoryReview>();
-            configuration.CreateMap<BookmarkStoryModelResponse, BookmarkStory>();
-            configuration.CreateMap<BookmarkStory, BookmarkStoryModelResponse>();
+            configuration.CreateMap<BookmarkStory, BookmarkStoryModelResponse>().ReverseMap();
+            configuration.CreateMap<StoryNotifications, NotificationModels>().ReverseMap();
+
             #endregion
             #region Tag
-            configuration.CreateMap<TagModelResponse, Tag>();
-            configuration.CreateMap<Tag, TagModelResponse>();
-            configuration.CreateMap<TagInStory, TagInStoriesModelResponse>();
-            configuration.CreateMap<TagInStoriesModelResponse, TagInStory>();
+            configuration.CreateMap<Tag, TagModelResponse>().ReverseMap();
+            configuration.CreateMap<TagInStory, TagInStoriesModelResponse>().ReverseMap();
             configuration.CreateMap<CreateTagCommand, Tag>();
             configuration.CreateMap<UpdateTagCommand, Tag>();
             configuration.CreateMap<CreateTagInStoryCommand, TagInStory>();
             configuration.CreateMap<UpdateTagInStoryCommand, TagInStory>();
-            configuration.CreateMap<RemoveTagInStoryCommand, TagInStory>();
-            configuration.CreateMap<TagInStory, RemoveTagInStoryCommand>();
+            configuration.CreateMap<TagInStory, RemoveTagInStoryCommand>().ReverseMap();
             #endregion
             #region Category
-            configuration.CreateMap<CategoryResponse, CategoryEntities>();
-            configuration.CreateMap<CategoryEntities, CategoryResponse>();
+            configuration.CreateMap<CategoryEntities, CategoryResponse>().ReverseMap();
             configuration.CreateMap<CreateCategoryCommand, CategoryEntities>();
             configuration.CreateMap<UpdateCategoryCommand, CategoryEntities>();
             #endregion
             #region Chapter
-            configuration.CreateMap<ChapterEntites, ChapterChunkResponse>();
-            configuration.CreateMap<ChapterChunkResponse, ChapterEntites>();
-            configuration.CreateMap<ChapterModelResponse, ChapterEntites>();
-            configuration.CreateMap<ChapterEntites, ChapterModelResponse>();
+            configuration.CreateMap<ChapterEntites, ChapterChunkResponse>().ReverseMap();
+            configuration.CreateMap<ChapterEntites, ChapterModelResponse>().ReverseMap();
             configuration.CreateMap<CreateChapterCommand, ChapterEntites>();
             configuration.CreateMap<UpdateChapterCommand, ChapterEntites>();
             configuration.CreateMap<ChapterModelRequest, ChapterEntites>();

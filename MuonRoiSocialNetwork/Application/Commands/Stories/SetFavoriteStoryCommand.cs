@@ -8,11 +8,13 @@ using MuonRoi.Social_Network.Categories;
 using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Application.Commands.Base.Stories;
 using MuonRoiSocialNetwork.Common.Models.Notifications;
+using MuonRoiSocialNetwork.Common.Models.Notifications.Base;
 using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.DomainObjects.Storys;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral;
+using MuonRoiSocialNetwork.Infrastructure.Repositories.Stories;
 using Serilog;
 
 namespace MuonRoiSocialNetwork.Application.Commands.Stories
@@ -37,6 +39,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         private readonly IStoriesFavoriteRepository _storiesFavoriteRepository;
         private readonly IStoriesFavoriteQueries _storiesFavoriteQueries;
         private readonly AuthContext _authContext;
+        private readonly IStoryNotificationRepository _storyNotificationRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -49,13 +52,15 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="storiesFavoriteRepository"></param>
         /// <param name="context"></param>
         /// <param name="storiesFavoriteQueries"></param>
-        public SetFavoriteStoryCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, ILoggerFactory logger, IHubContext<NotificationHub> hubContext, IStoriesFavoriteRepository storiesFavoriteRepository, AuthContext context, IStoriesFavoriteQueries storiesFavoriteQueries) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        /// <param name="storyNotificationRepository"></param>
+        public SetFavoriteStoryCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, ILoggerFactory logger, IHubContext<NotificationHub> hubContext, IStoriesFavoriteRepository storiesFavoriteRepository, AuthContext context, IStoriesFavoriteQueries storiesFavoriteQueries, IStoryNotificationRepository storyNotificationRepository) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _logger = logger.CreateLogger<SetFavoriteStoryCommandHandler>();
             _hubContext = hubContext;
             _storiesFavoriteRepository = storiesFavoriteRepository;
             _authContext = context;
             _storiesFavoriteQueries = storiesFavoriteQueries;
+            _storyNotificationRepository = storyNotificationRepository;
         }
         /// <summary>
         /// Function handler
@@ -118,11 +123,27 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Send notification to user favorite
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new NotificationModels
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new BaseNotificationModels
                 {
                     NotificationContent = $"Your story {existStory.StoryTitle} have new likes!",
                     TimeCreated = DateTime.Now.ToString("MM/dd")
                 }, existStory.CreatedUserGuid, cancellationToken: cancellationToken);
+                #endregion
+
+                #region Save notification to db
+                var storyNotification = new StoryNotifications()
+                {
+                    Title = existStory.StoryTitle,
+                    Message = $"{_authContext.CurrentNameUser}-{existStory.StoryTitle}",
+                    ImgUrl = existStory.ImgUrl,
+                    NotificationUrl = "notification/user",
+                    StoryId = existStory.Id,
+                    UserGuid = Guid.Parse(_authContext.CurrentUserId),
+                    NotificationSate = EnumStateNotification.SENT,
+                    NotificationType = Common.Settings.SignalRSettings.Enum.NotificationType.StoryFavorite
+                };
+                _storyNotificationRepository.Add(storyNotification);
+                await _storyNotificationRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 #endregion
             }
             catch (Exception ex)

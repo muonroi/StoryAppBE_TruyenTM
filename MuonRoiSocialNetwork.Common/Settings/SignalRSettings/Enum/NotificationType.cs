@@ -6,5 +6,7 @@
         StoryFavorite = 1,
         VoteStory = 2,
         BookmarkStory = 3,
+        PublishStory = 4,
+        UserRole = 5
     }
 }

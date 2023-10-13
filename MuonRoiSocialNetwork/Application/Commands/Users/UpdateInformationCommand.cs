@@ -21,8 +21,6 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
     /// </summary>
     public class UpdateInformationCommand : BaseUserRequest, IRequest<MethodResult<BaseUserResponse>>
     {
-        [JsonProperty("avatarTemp")]
-        public IFormFile? AvatarTemp { get; set; }
 
         [JsonProperty("newSalf")]
         public string? NewSalf { get; set; } = null;
@@ -99,34 +97,17 @@ namespace MuonRoiSocialNetwork.Application.Commands.Users
                 }
                 #endregion
 
-                #region upload avatar
-
-                if (request.AvatarTemp is not null)
-                {
-                    Dictionary<string, string> result = await HandlerImages.UploadImageToAwsAsync(_configuration, request.AvatarTemp);
-                    userIsExist.Result.Avatar = result.Keys.FirstOrDefault();
-                    if (result.Values.Equals("OK"))
-                    {
-                        methodResult.StatusCode = StatusCodes.Status400BadRequest;
-                        methodResult.AddApiErrorMessage(
-                            nameof(EnumUserErrorCodes.USRC41C),
-                            new[] { Helpers.GenerateErrorResult(nameof(request.UserName), request.UserName ?? "") }
-                        );
-                        return methodResult;
-                    }
-                }
-                #endregion
-
                 #region Update info user
-                _mapper.Map(request, userIsExist);
-                userIsExist.Result.Status = request.AccountStatus == EnumAccountStatus.None ? request.AccountStatus : userIsExist.Result.AccountStatus;
-                userIsExist.Result.LockReason = request.Reason ?? userIsExist.Result.LockReason;
-                await _userRepository.UpdateUserAsync(userIsExist.Result, request.NewSalf, request.NewPassword);
+                var userInfoUpdate = userIsExist.Result;
+                _mapper.Map(request, userInfoUpdate);
+                userInfoUpdate.Status = request.AccountStatus == EnumAccountStatus.None ? request.AccountStatus : userInfoUpdate.AccountStatus;
+                userInfoUpdate.LockReason = request.Reason ?? userInfoUpdate.LockReason;
+                await _userRepository.UpdateUserAsync(userInfoUpdate, request.NewSalf, request.NewPassword);
                 #endregion
 
                 #region Return info user updated
-                var inforResult = await _userQueries.GetByUsernameAsync(userIsExist.Result.UserName ?? "");
-                BaseUserResponse resultInforLoginUser = _mapper.Map<BaseUserResponse>(inforResult.Result);
+                userInfoUpdate.Avatar = HandlerImages.TakeLinkImage(_configuration, userInfoUpdate.Avatar ?? "");
+                BaseUserResponse resultInforLoginUser = _mapper.Map<BaseUserResponse>(userInfoUpdate);
                 methodResult.Result = resultInforLoginUser;
                 methodResult.StatusCode = StatusCodes.Status200OK;
                 #endregion

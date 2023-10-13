@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Application.Commands.Base.Stories;
 using MuonRoiSocialNetwork.Common.Models.Notifications;
+using MuonRoiSocialNetwork.Common.Models.Notifications.Base;
 using MuonRoiSocialNetwork.Common.Models.Stories.Response.Dto;
 using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
@@ -40,6 +41,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         private readonly ILogger<VoteOfStoryCommandHandler> _logger;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly AuthContext _authContext;
+        private readonly IStoryNotificationRepository _storyNotificationRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -50,11 +52,13 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="hubContext"></param>
         /// <param name="storiesRepository"></param>
         /// <param name="auth"></param>
-        public VoteOfStoryCommandHandler(ILoggerFactory logger, IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IHubContext<NotificationHub> hubContext, AuthContext auth) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        /// <param name="storyNotificationRepository"></param>
+        public VoteOfStoryCommandHandler(ILoggerFactory logger, IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IHubContext<NotificationHub> hubContext, AuthContext auth, IStoryNotificationRepository storyNotificationRepository) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _logger = logger.CreateLogger<VoteOfStoryCommandHandler>();
             _hubContext = hubContext;
             _authContext = auth;
+            _storyNotificationRepository = storyNotificationRepository;
         }
         /// <summary>
         /// Function handle vote of story
@@ -95,7 +99,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 }
                 #endregion
 
-                #region Pushlish
+                #region Publish
                 storyRattings = JsonConvert.DeserializeObject<StoryRattings>(existStory.ListRattings) ?? new()
                 {
                     Data = new List<Rattings>()
@@ -115,12 +119,28 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Send notification to user favorite
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new NotificationModels
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameVoteHear, existStory.Guid)).SendAsync("ReceiveSingle", new BaseNotificationModels
                 {
                     NotificationContent = $"{existStory.StoryTitle}-{_authContext.CurrentNameUser}-{storyRattings.Data.Average(x => x.RattingValues)}",
                     TimeCreated = DateTime.Now.ToString("MM/dd"),
                     Type = Common.Settings.SignalRSettings.Enum.NotificationType.VoteStory
                 }, existStory.CreatedUserGuid, cancellationToken: cancellationToken);
+                #endregion
+
+                #region Save notification to db
+                var storyNotification = new StoryNotifications()
+                {
+                    Title = existStory.StoryTitle,
+                    Message = $"{_authContext.CurrentNameUser}-{existStory.StoryTitle}",
+                    ImgUrl = existStory.ImgUrl,
+                    NotificationUrl = "notification/user",
+                    StoryId = existStory.Id,
+                    UserGuid = Guid.Parse(_authContext.CurrentUserId),
+                    NotificationSate = EnumStateNotification.SENT,
+                    NotificationType = Common.Settings.SignalRSettings.Enum.NotificationType.VoteStory
+                };
+                _storyNotificationRepository.Add(storyNotification);
+                await _storyNotificationRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 #endregion
             }
             catch (Exception ex)

@@ -16,5 +16,7 @@ namespace MuonRoiSocialNetwork.Common.Models.Users.Response
 
         [JsonProperty("locationUserLogin")]
         public LocationUserLogin? LocationUserLogin { get; set; }
+        [JsonProperty("notificationNumber")]
+        public int NotificationNumber { get; set; }
     }
 }

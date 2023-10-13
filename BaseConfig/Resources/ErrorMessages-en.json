@@ -1,4 +1,50 @@
 {
+  //--------------------\
+  //Chapter
+  "CT00": "Chapter title cannot be empty",
+  "CT01": "Chapter title exceeds the maximum character limit (255)",
+  "CT02": "Chapter title must have a minimum of 3 characters",
+  "CT04": "Story content cannot be empty",
+  "CT05": "Story content exceeds the maximum character limit (100000)",
+  "CT06": "Story content must have a minimum of 750 characters",
+  "CT07": "Chapter number cannot be empty",
+  "CT08": "Chapter number exceeds the maximum character limit (200)",
+  "CT09": "The number of characters in the story cannot be empty",
+  "CT10": "Story chapter path",
+  "CT11": "Chapter does not exist",
+  //--------------------\
+  //Category
+  "CTS00": "Category name cannot be empty",
+  "CTS01": "Please select a category",
+  "CTS02": "Category does not exist",
+  "CTS03": "The number must be less than 100",
+  "CTS04": "Category name already exists",
+  //--------------------\
+  //Group
+  "GRP01C": "Group name cannot be empty",
+  "GRP02C": "Group description cannot exceed 500 characters",
+  "GRP04C": "Group does not exist",
+  "GRP06C": "Group name cannot exceed 100 characters",
+  "GRP09C": "Group code cannot be empty",
+  "GRP10C": "Group code cannot exceed 100 characters",
+  "GRP13C": "Group already exists",
+  //--------------------\
+  //Story notification
+  "NT00": "Notification path cannot be empty",
+  "NT01": "Maximum length of the path is 1000 characters",
+  "NT02": "Title cannot be empty",
+  "NT03": "Title exceeds the maximum character limit (200)",
+  "NT04": "Content cannot be empty",
+  "NT05": "Content exceeds the maximum character limit (350)",
+  //--------------------\
+  //Role
+  "ROL01C": "Role list cannot be null",
+  "ROL02C": "Role does not exist",
+  "ROL03C": "Invalid role name",
+  "ROL04C": "Role name is required",
+  "ROL05C": "Role name maximum length is 100 characters",
+  "ROL06C": "Role description cannot exceed 1000 characters",
+  "ROL07C": "Role name already exists",
   //Story
   "ST00": "Story title cannot be empty",
   "ST01": "Story title exceeds the maximum character limit (255)",
@@ -17,16 +63,10 @@
   "ST14": "Story has been liked",
   "ST15": "Update content is empty",
   //--------------------\
-
-  //Story notification
-  "NT00": "Notification path cannot be empty",
-  "NT01": "Maximum length of the path is 1000 characters",
-  "NT02": "Title cannot be empty",
-  "NT03": "Title exceeds the maximum character limit (200)",
-  "NT04": "Content cannot be empty",
-  "NT05": "Content exceeds the maximum character limit (350)",
+  //Tag in story
+  "TIS01": "Tag id or story guid is not exist",
+  "TIS02": "Tag is a really assign to story",
   //--------------------\
-
   //Tag
   "TT00": "Tag name cannot be empty",
   "TT01": "Tag name is too long (less than or equal to 50 characters)",
@@ -41,25 +81,24 @@
   "TT10": "The number of tags must be less than 30",
   "TT11": "Tag already exists",
   //--------------------\
-
   //User Member
   "USR01C": "Invalid password",
   "USR02C": "Account does not exist",
   "USR03C": "Username is required",
-  "USR08C": "Username maximum length is 100 characters",
   "USR04C": "First and last name are required",
-  "USR09C": "First and last name maximum length is 100 characters",
   "USR05C": "Account is required",
-  "USR10C": "Account maximum length is 100 characters",
   "USR06C": "Password is required",
-  "USR11C": "Password maximum length is 1000",
   "USR07C": "Encryption key is required",
+  "USR08C": "Username maximum length is 100 characters",
+  "USR09C": "First and last name maximum length is 100 characters",
+  "USR10C": "Account maximum length is 100 characters",
+  "USR11C": "Password maximum length is 1000",
   "USR12C": "Encryption key maximum length is 1000 characters",
   "USR13C": "Account already exists",
   "USR14C": "Account only allows [a-z, A-Z, 0-9, _]",
   "USR15C": "Account must have a minimum of 4 characters",
-  "USR17C": "• At least one uppercase letter • At least one lowercase letter • At least one digit • At least one special character",
   "USR16C": "Account must have a minimum of 8 characters",
+  "USR17C": "• At least one uppercase letter • At least one lowercase letter • At least one digit • At least one special character",
   "USR18C": "Address cannot exceed 1000 characters",
   "USR19C": "Email is not in the correct format",
   "USR20C": "Email cannot exceed 1000 characters",
@@ -94,53 +133,5 @@
   "USRC49C": "Invalid input format",
   "USRC50C": "Update failed. Please contact the development team",
   "USRC51C": "Failed to add. Please contact the development team",
-  "USRC52C": "Failed to delete. Please contact the development team",
-  //--------------------\
-
-  //Role
-  "ROL01C": "Role list cannot be null",
-  "ROL02C": "Role does not exist",
-  "ROL03C": "Invalid role name",
-  "ROL04C": "Role name is required",
-  "ROL05C": "Role name maximum length is 100 characters",
-  "ROL06C": "Role description cannot exceed 1000 characters",
-  "ROL07C": "Role name already exists",
-  //--------------------\
-
-  //Group
-  "GRP01C": "Group name cannot be empty",
-  "GRP02C": "Group description cannot exceed 500 characters",
-  "GRP04C": "Group does not exist",
-  "GRP06C": "Group name cannot exceed 100 characters",
-  "GRP09C": "Group code cannot be empty",
-  "GRP10C": "Group code cannot exceed 100 characters",
-  "GRP13C": "Group already exists",
-  //--------------------\
-
-  //Chapter
-  "CT00": "Chapter title cannot be empty",
-  "CT01": "Chapter title exceeds the maximum character limit (255)",
-  "CT02": "Chapter title must have a minimum of 3 characters",
-  "CT04": "Story content cannot be empty",
-  "CT05": "Story content exceeds the maximum character limit (100000)",
-  "CT06": "Story content must have a minimum of 750 characters",
-  "CT07": "Chapter number cannot be empty",
-  "CT08": "Chapter number exceeds the maximum character limit (200)",
-  "CT09": "The number of characters in the story cannot be empty",
-  "CT10": "Story chapter path",
-  "CT11": "Chapter does not exist",
-  //--------------------\
-
-  //Category
-  "CTS00": "Category name cannot be empty",
-  "CTS01": "Please select a category",
-  "CTS02": "Category does not exist",
-  "CTS03": "The number must be less than 100",
-  "CTS04": "Category name already exists",
-  //--------------------\
-
-  //Tag in story
-  "TIS01": "Tag id or story guid is not exist",
-  "TIS02": "Tag is a really assign to story"
-  //--------------------\
+  "USRC52C": "Failed to delete. Please contact the development team"
 }

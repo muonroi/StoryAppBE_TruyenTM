@@ -2,7 +2,6 @@
 using BaseConfig.MethodResult;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ChapterEntites = MuonRoi.Social_Network.Chapters.Chapter;
 using MuonRoiSocialNetwork.Application.Commands.Chapter;
 using MuonRoiSocialNetwork.Common.Models.Chapter.Request;
 using MuonRoiSocialNetwork.Common.Models.Chapter.Response;
@@ -10,7 +9,6 @@ using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters;
 using System.Net;
 using AutoMapper;
 using BaseConfig.BaseDbContext.Common;
-using MuonRoi.Social_Network.Chapters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using BaseConfig.Infrashtructure;
@@ -19,7 +17,6 @@ using MuonRoiSocialNetwork.Common.Models.Logs;
 using Serilog;
 using Newtonsoft.Json;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
-using static Dapper.SqlMapper;
 using MuonRoiSocialNetwork.Common.Settings.Appsettings;
 
 namespace MuonRoiSocialNetwork.Controllers.Chapter
@@ -76,6 +73,8 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(ChapterController),
                     ApiName = nameof(InitialNewChapter),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -124,6 +123,8 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(ChapterController),
                     ApiName = nameof(UpdateChapter),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -171,6 +172,8 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(ChapterController),
                     ApiName = nameof(DeleteChapter),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -249,11 +252,11 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
         [AllowAnonymous]
         [ProducesResponseType(typeof(MethodResult<IEnumerable<ChapterModelResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, long fromChapterId = 0, long toChapterId = 0)
+        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
         {
             try
             {
-                MethodResult<IEnumerable<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, fromChapterId, toChapterId).ConfigureAwait(false);
+                MethodResult<IEnumerable<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, fromChapterId, toChapterId, isSetCache).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
@@ -337,11 +340,11 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
         [AllowAnonymous]
         [ProducesResponseType(typeof(MethodResult<List<ChapterListPagingResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> PagingChapterListByStoryId([FromQuery] int storyId)
+        public async Task<IActionResult> PagingChapterListByStoryId([FromQuery] int storyId, bool isSetCache = false)
         {
             try
             {
-                MethodResult<List<ChapterListPagingResponse>> methodResult = await _chapterQueries.PagingChapterListByStoryId(storyId).ConfigureAwait(false);
+                MethodResult<List<ChapterListPagingResponse>> methodResult = await _chapterQueries.PagingChapterListByStoryId(storyId, isSetCache).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)
@@ -364,6 +367,28 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
             try
             {
                 MethodResult<ChapterChunkResponse> methodResult = await _chapterQueries.ChunkChapterListByStoryId(chapterId, chunkSize).ConfigureAwait(false);
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+        /// <summary>
+        /// Get group character API
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("group-chapter")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<PagingItemsDTO<ChapterModelResponse>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GroupChapterListByStoryId([FromQuery] int storyId, int pageIndex, int pageSize = 100, bool isSetCache = false)
+        {
+            try
+            {
+                MethodResult<PagingItemsDTO<ChapterModelResponse>> methodResult = await _chapterQueries.GroupChapterListByStoryId(storyId, pageIndex, pageSize, isSetCache).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)

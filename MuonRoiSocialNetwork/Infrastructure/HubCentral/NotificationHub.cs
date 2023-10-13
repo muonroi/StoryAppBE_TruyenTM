@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using MuonRoiSocialNetwork.Common.Models.Notifications;
 using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral.Base;
+using Serilog;
 
 namespace MuonRoiSocialNetwork.Infrastructure.HubCentral
 {
@@ -14,6 +15,27 @@ namespace MuonRoiSocialNetwork.Infrastructure.HubCentral
     {
         private readonly static BaseNotification<string> _connections =
             new();
+        /// <summary>
+        /// Connected
+        /// </summary>
+        /// <returns></returns>
+        public override Task OnConnectedAsync()
+        {
+            base.OnConnectedAsync();
+            Log.Information($"UserId: {Context.UserIdentifier} is connected!");
+            return Task.CompletedTask;
+        }
+        /// <summary>
+        /// Disconnected
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            base.OnDisconnectedAsync(exception);
+            Log.Information($"UserId: {Context.UserIdentifier} is disconnected! with reason: {exception?.Message} {exception}");
+            return Task.CompletedTask;
+        }
         /// <summary>
         /// Join user to group
         /// </summary>

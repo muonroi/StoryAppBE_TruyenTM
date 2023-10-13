@@ -34,11 +34,9 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
     public class DeleteBookmarkStoryCommandHandler : BaseStoriesCommandHandler, IRequestHandler<DeleteBookmarkStoryCommand, MethodResult<bool>>
     {
         private readonly ILogger<BookmarkStoryCommandHandler> _logger;
-        private readonly IUserQueries _userQueries;
         private readonly AuthContext _authContext;
         private readonly IBookmarkStoryRepository _bookmarkStoryRepository;
         private readonly IBookmarkStoryQueries _bookmarkStoryQueries;
-        private readonly IHubContext<NotificationHub> _hubContext;
 
         /// <summary>
         /// Constructor
@@ -48,19 +46,15 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="storiesQuerie"></param>
         /// <param name="storiesRepository"></param>
         /// <param name="logger"></param>
-        /// <param name="userQueries"></param>
         /// <param name="authContext"></param>
         /// <param name="bookmarkStoryRepository"></param>
         /// <param name="bookmarkStoryQueries"></param>
-        /// <param name="hubContext"></param>
-        public DeleteBookmarkStoryCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, ILoggerFactory logger, IUserQueries userQueries, AuthContext authContext, IBookmarkStoryRepository bookmarkStoryRepository, IBookmarkStoryQueries bookmarkStoryQueries, IHubContext<NotificationHub> hubContext) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        public DeleteBookmarkStoryCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, ILoggerFactory logger, AuthContext authContext, IBookmarkStoryRepository bookmarkStoryRepository, IBookmarkStoryQueries bookmarkStoryQueries) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _logger = logger.CreateLogger<BookmarkStoryCommandHandler>();
-            _userQueries = userQueries;
             _authContext = authContext;
             _bookmarkStoryRepository = bookmarkStoryRepository;
             _bookmarkStoryQueries = bookmarkStoryQueries;
-            _hubContext = hubContext;
         }
         /// <summary>
         /// Handle funciton
@@ -85,6 +79,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                     return methodResult;
                 }
                 #endregion
+
                 #region Check story bookmark for user
                 var bookmarkResult = await _bookmarkStoryQueries.ExistBookmarkStoryOfUser(request.StoryGuid, new Guid(_authContext.CurrentUserId));
                 if (bookmarkResult.Result is not null)
@@ -100,6 +95,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                     });
                 }
                 #endregion
+
                 methodResult.Result = false;
                 methodResult.StatusCode = StatusCodes.Status400BadRequest;
 
@@ -124,9 +120,6 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 methodResult.Result = false;
                 return methodResult;
             }
-            methodResult.StatusCode = StatusCodes.Status200OK;
-            methodResult.Result = true;
-            return methodResult;
         }
     }
 }

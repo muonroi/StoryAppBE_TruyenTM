@@ -7,6 +7,5 @@
     {
         SEEN,
         SENT,
-        RECEIVED
     }
 }

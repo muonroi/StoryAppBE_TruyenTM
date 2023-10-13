@@ -1,5 +1,6 @@
 ﻿using BaseConfig.EntityObject.Entity;
 using MuonRoi.Social_Network.Users;
+using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,7 +27,7 @@ namespace MuonRoi.Social_Network.Storys
         [Required(ErrorMessage = nameof(EnumNotificationStoryErrorCodes.NT00))]
         [MaxLength(1000, ErrorMessage = nameof(EnumNotificationStoryErrorCodes.NT01))]
         [Column("notify_url")]
-        public string NotifyUrl { get; set; }
+        public string NotificationUrl { get; set; }
         /// <summary>
         /// Title''s notifition
         /// </summary>
@@ -47,10 +48,10 @@ namespace MuonRoi.Social_Network.Storys
         [Column("notification_state")]
         public EnumStateNotification NotificationSate { get; set; }
         /// <summary>
-        /// Check notifition was watched?
+        /// Notification type
         /// </summary>
-        [Column("read_date")]
-        public DateTime ReadNotificationDate { get; set; }
+        [Column("notification_type")]
+        public NotificationType NotificationType { get; set; }
         /// <summary>
         /// Url img of story
         /// </summary>

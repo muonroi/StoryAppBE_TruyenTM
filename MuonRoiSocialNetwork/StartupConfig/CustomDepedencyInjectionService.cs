@@ -70,6 +70,8 @@ namespace MuonRoiSocialNetwork.StartupConfig
             services.AddScoped<IRefreshTokenQueries, RefreshTokenQueries>();
             services.AddScoped<IBookmarkStoryRepository, BookmarkStoryRepository>();
             services.AddScoped<IBookmarkStoryQueries, BookmarkStoryQueries>();
+            services.AddScoped<IStoryNotificationQueries, StoryNotificationQueries>();
+            services.AddScoped<IStoryNotificationRepository, StoryNotificationRepository>();
             return services;
         }
         public static IServiceCollection RegisterSingleton(this IServiceCollection services)

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using static IdentityModel.ClaimComparer;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {
@@ -26,7 +27,7 @@ namespace MuonRoiSocialNetwork.StartupConfig
             .AddJsonFile($"appsettings.Production.json", optional: true);
             var config = customAppsetting.Build();
             builder.Services.CustomAuthentication(config);
-            builder.Services.CustomeAuthorization();
+            builder.Services.CustomAuthorization();
             builder.Services.RegisterTransient();
             builder.Services.SwaggerConfiguration();
             builder.Services.RegisterScoped();
@@ -42,6 +43,7 @@ namespace MuonRoiSocialNetwork.StartupConfig
             builder.Services.AddDbContext<MuonRoiSocialNetworkDbContext>(opt =>
             {
                 opt.UseNpgsql(config[ConstAppSettings.Instance.CONNECTIONSTRING_DB] ?? ConstAppSettings.Instance.CONNECTIONSTRING_DB, sql => sql.EnableRetryOnFailure(3));
+                opt.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
             builder.Services.Configure<SMTPConfigModel>(config.GetSection($"{NameAppSetting.SMTPCONFIG}"));
             var hangfire_connection = config[ConstAppSettings.Instance.CONNECTIONSTRING_HANGFIRE] ?? ConstAppSettings.Instance.CONNECTIONSTRING_HANGFIRE;

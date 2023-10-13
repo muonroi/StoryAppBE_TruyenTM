@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using MuonRoi.Social_Network.Users;
-using System;
 
 namespace MuonRoiSocialNetwork.Common.Models.Users.Base.Response
 {
@@ -8,17 +7,12 @@ namespace MuonRoiSocialNetwork.Common.Models.Users.Base.Response
     {
         [JsonProperty("name")]
         public string? Name { get; set; }
-
         [JsonProperty("surname")]
         public string? Surname { get; set; }
-
         [JsonProperty("id")]
         public Guid Id { get; set; }
-
         [JsonProperty("username")]
         public string? Username { get; set; }
-        [JsonProperty("password_hash")]
-        public string? PasswordHash { get; set; }
         [JsonProperty("email")]
         public string? Email { get; set; }
         [JsonProperty("address")]
@@ -49,5 +43,7 @@ namespace MuonRoiSocialNetwork.Common.Models.Users.Base.Response
         public string? RoleName { get; set; }
         [JsonProperty("groupName")]
         public string? GroupName { get; set; }
+        [JsonProperty("phoneNumber")]
+        public string? PhoneNumber { get; set; }
     }
 }

@@ -9,10 +9,12 @@ using Microsoft.AspNetCore.SignalR;
 using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Application.Commands.Base.Stories;
 using MuonRoiSocialNetwork.Common.Models.Notifications;
+using MuonRoiSocialNetwork.Common.Models.Notifications.Base;
 using MuonRoiSocialNetwork.Common.Settings.SignalRSettings.GroupName;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral;
+using MuonRoiSocialNetwork.Infrastructure.Repositories.Stories;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -35,7 +37,8 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
     {
         private readonly ILogger<PublishStoryCommandHandler> _logger;
         private readonly IHubContext<NotificationHub> _hubContext;
-
+        private readonly AuthContext _authContext;
+        private readonly IStoryNotificationRepository _storyNotificationRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -45,10 +48,14 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="storiesRepository"></param>
         /// <param name="logger"></param>
         /// <param name="hubContext"></param>
-        public PublishStoryCommandHandler(ILoggerFactory logger, IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IHubContext<NotificationHub> hubContext) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        /// <param name="storyNotificationRepository"></param>
+        /// <param name="authContext"></param>
+        public PublishStoryCommandHandler(ILoggerFactory logger, IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IHubContext<NotificationHub> hubContext, AuthContext authContext, IStoryNotificationRepository storyNotificationRepository) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _logger = logger.CreateLogger<PublishStoryCommandHandler>();
             _hubContext = hubContext;
+            _authContext = authContext;
+            _storyNotificationRepository = storyNotificationRepository;
         }
         /// <summary>
         /// Handle function
@@ -86,18 +93,36 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 }
                 #endregion
 
-                #region Pushlish
+                #region Publish
                 await _storiesRepository.UpdateSingleEntry(existStory, nameof(existStory.IsShow), true);
                 #endregion
 
                 #region Send notification to user favorite
-                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, StringManagers.GenerateSlug(existStory.AuthorName))).SendAsync(GroupHelperConst.Instance.StreamNameFavorite, JsonConvert.SerializeObject(new NotificationModels
+                await _hubContext.Clients.Group(string.Format(GroupHelperConst.Instance.GroupNameFavorite, StringManagers.GenerateSlug(existStory.AuthorName))).SendAsync(GroupHelperConst.Instance.StreamNameFavorite, JsonConvert.SerializeObject(new BaseNotificationModels
                 {
                     NotificationContent = $"{existStory.StoryTitle}-{existStory.AuthorName}",
                     TimeCreated = DateTime.Now.ToString("MM/dd"),
                     Url = existStory.ImgUrl,
                     Type = Common.Settings.SignalRSettings.Enum.NotificationType.StoryFavorite
                 }), cancellationToken: cancellationToken);
+                #endregion
+
+                #region Save notification to db
+                var storyNotification = new StoryNotifications()
+                {
+                    Title = existStory.StoryTitle,
+                    Message = $"{_authContext.CurrentNameUser}-{existStory.StoryTitle}",
+                    ImgUrl = existStory.ImgUrl,
+                    NotificationUrl = "notification/user",
+                    StoryId = existStory.Id,
+                    UserGuid = Guid.Parse(_authContext.CurrentUserId),
+                    NotificationSate = EnumStateNotification.SENT,
+                    NotificationType = Common.Settings.SignalRSettings.Enum.NotificationType.PublishStory
+
+
+                };
+                _storyNotificationRepository.Add(storyNotification);
+                await _storyNotificationRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 #endregion
             }
             catch (Exception ex)

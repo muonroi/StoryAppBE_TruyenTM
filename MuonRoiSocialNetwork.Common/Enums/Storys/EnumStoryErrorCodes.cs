@@ -94,5 +94,9 @@
         /// Nội dung vượt quá kí tự quy định 350 kí tự
         /// </summary>
         NT05,
+        /// <summary>
+        /// Không có thông báo
+        /// </summary>
+        NT06,
     }
 }

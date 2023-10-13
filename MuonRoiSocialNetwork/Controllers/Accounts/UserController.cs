@@ -17,6 +17,7 @@ using Serilog;
 using MuonRoiSocialNetwork.Common.Models.Logs;
 using MuonRoiSocialNetwork.Common.Settings.RoleSettings;
 using MuonRoiSocialNetwork.Common.Settings.Appsettings;
+using MuonRoiSocialNetwork.Common.Models.Users;
 
 namespace MuonRoiSocialNetwork.Controllers.Accounts
 {
@@ -69,6 +70,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(RegisterUser),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -112,6 +115,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(LoginAuth),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -155,6 +160,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(VerificationEmail),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -186,18 +193,20 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
         [Authorize(Policy = nameof(RoleSettings.MOD))]
         [ProducesResponseType(typeof(MethodResult<BaseUserResponse>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> UpdateInformation([FromBody] UpdateInformationCommand userChange)
+        public async Task<IActionResult> UpdateInformation([FromBody] UpdateInformationCommand cmd)
         {
             try
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                MethodResult<BaseUserResponse> methodResult = await _mediator.Send(userChange).ConfigureAwait(false);
+                MethodResult<BaseUserResponse> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
                 stopwatch.Stop();
                 LogsDto logsInfo = new()
                 {
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(UpdateInformation),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -245,6 +254,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(DeleteUserByGuid),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -288,6 +299,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(FotgotPassword),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -331,6 +344,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(ChangePasswordForgot),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -374,6 +389,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(ChangeStatusAccount),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -417,6 +434,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(ResendMailVeritification),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -465,6 +484,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(AssignUserToGroup),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -508,6 +529,8 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(SendOtpToWhatsApp),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
@@ -551,6 +574,53 @@ namespace MuonRoiSocialNetwork.Controllers.Accounts
                     Username = _auth.CurrentUsername,
                     ServiceName = nameof(UserController),
                     ApiName = nameof(ValidOtpToWhatsApp),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
+                    IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
+                    DurationTime = stopwatch.ElapsedMilliseconds,
+                    Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,
+                    StatusCode = methodResult.StatusCode ?? 0,
+                    ErrorMessages = methodResult.ErrorMessages.FirstOrDefault()?.ErrorMessage ?? string.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+                Log.Information($"{JsonConvert.SerializeObject(logsInfo)}");
+                return methodResult.GetActionResult();
+            }
+            catch (Exception ex)
+            {
+                LogsError logsError = new()
+                {
+                    FullInfo = ex.ToString(),
+                    MessageShort = ex.Message
+                };
+                Log.Error($"{JsonConvert.SerializeObject(logsError)}");
+                var errCommandResult = new VoidMethodResult();
+                errCommandResult.AddErrorMessage(Helpers.GetExceptionMessage(ex), ex.StackTrace ?? "");
+                return errCommandResult.GetActionResult();
+            }
+        }
+
+        /// <summary>
+        /// Update avatart for user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("update-avatar")]
+        [ProducesResponseType(typeof(MethodResult<UserModelResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> UpdateAvatarUser([FromForm] UploadImageUserCommand cmd)
+        {
+            try
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                MethodResult<UserModelResponse> methodResult = await _mediator.Send(cmd).ConfigureAwait(false);
+                stopwatch.Stop();
+                LogsDto logsInfo = new()
+                {
+                    Username = _auth.CurrentUsername,
+                    ServiceName = nameof(UserController),
+                    ApiName = nameof(UpdateAvatarUser),
+                    Request = JsonConvert.SerializeObject(cmd),
+                    Response = JsonConvert.SerializeObject(methodResult),
                     IpAddress = _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty,
                     DurationTime = stopwatch.ElapsedMilliseconds,
                     Browser = _httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty,

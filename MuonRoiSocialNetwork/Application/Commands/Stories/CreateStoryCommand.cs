@@ -79,6 +79,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                     throw new CustomException(newStory.ErrorMessages);
                 }
                 #endregion
+
                 #region Check category
                 CategoryEntities category = await _categoryQueries.GetByIdAsync(request.CategoryId);
                 if (category is null)

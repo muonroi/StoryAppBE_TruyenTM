@@ -25,8 +25,9 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// <param name="storyId"></param>
         /// <param name="fromChapterId"></param>
         /// <param name="toChapterId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
-        Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0);
+        Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false);
 
         /// <summary>
         /// Get list chapters of story
@@ -41,8 +42,9 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// Total chapter of story
         /// </summary>
         /// <param name="storyId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
-        Task<MethodResult<int>> GetTotalChapterOfStoryIdAsync(long storyId);
+        Task<MethodResult<int>> GetTotalChapterOfStoryIdAsync(long storyId, bool isSetCache = false);
         /// <summary>
         /// Get first and last chapter
         /// </summary>
@@ -67,8 +69,9 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// Get list chapter and paging according by 100 chapters each chunk
         /// </summary>
         /// <param name="storyId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
-        Task<MethodResult<List<ChapterListPagingResponse>>> PagingChapterListByStoryId(int storyId);
+        Task<MethodResult<List<ChapterListPagingResponse>>> PagingChapterListByStoryId(int storyId, bool isSetCache = false);
         /// <summary>
         /// Chunk chapter by id each 350 character
         /// </summary>
@@ -82,5 +85,14 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// <param name="chapterId"></param>
         /// <returns></returns>
         Task<MethodResult<ChapterModelResponse>> GetDetailChapterById(int chapterId);
+        /// <summary>
+        /// Group chapter by storyId
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="storyId"></param>
+        /// <param name="isSetCache"></param>
+        /// <returns></returns>
+        Task<MethodResult<PagingItemsDTO<ChapterModelResponse>>> GroupChapterListByStoryId(int storyId, int pageIndex = 1, int pageSize = 100, bool isSetCache = false);
     }
 }

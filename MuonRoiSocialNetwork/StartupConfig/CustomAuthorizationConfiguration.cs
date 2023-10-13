@@ -2,7 +2,7 @@
 {
     internal static class CustomAuthorizationConfiguration
     {
-        public static IServiceCollection CustomeAuthorization(this IServiceCollection services)
+        public static IServiceCollection CustomAuthorization(this IServiceCollection services)
         {
             services.AddAuthorization(options =>
             {

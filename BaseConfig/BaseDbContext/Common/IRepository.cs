@@ -11,6 +11,8 @@ namespace BaseConfig.BaseDbContext.Common
 
         Task<T> GetByGuidAsync(Guid guid, int? siteId = null);
 
+        Task<IEnumerable<T>> GetWhereAsync(Func<T, bool> predicate);
+
         Task<bool> AnyAsync(long id, int? siteId = null);
 
         Task<bool> AnyGuidAsync(Guid guid, int? siteId = null);

@@ -6,7 +6,6 @@ using BaseConfig.MethodResult;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using MuonRoi.Social_Network.Chapters;
-using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Common.Models.Chapter.Response;
 using MuonRoiSocialNetwork.Common.Settings.StorySettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters;
@@ -43,14 +42,24 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         {
             MethodResult<PagingItemsDTO<ChapterPreviewResponse>> methodResult = new();
             List<Chapter>? cacheQueryChapter = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseChapters, storyId)}");
-            if (cacheQueryChapter == null || !cacheQueryChapter.Any())
+            var chapterResult = cacheQueryChapter;
+            if (chapterResult == null || !chapterResult.Any())
             {
-                cacheQueryChapter = _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).ToList();
-                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseChapters, storyId)}", cacheQueryChapter, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
+                chapterResult = _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).ToList();
+                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseChapters, storyId)}", chapterResult, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
             }
-            IQueryable<Chapter> queryChapter = cacheQueryChapter.AsQueryable() ?? _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x);
+            if (chapterResult is null)
+            {
+                methodResult.StatusCode = StatusCodes.Status400BadRequest;
+                methodResult.AddApiErrorMessage(
+                    nameof(EnumChapterErrorCode.CT11),
+                    new[] { BaseConfig.EntityObject.Entity.Helpers.GenerateErrorResult(nameof(EnumChapterErrorCode.CT11), nameof(EnumChapterErrorCode.CT11)) }
+                );
+                return methodResult;
+            }
+            IQueryable<Chapter> queryChapter = chapterResult.AsQueryable() ?? _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x);
 
-            queryChapter = isLatest ? queryChapter.OrderByDescending(x => x.CreatedDateTS).Take(5) : queryChapter.OrderBy(x => x.NumberOfChapter);
+            queryChapter = isLatest ? queryChapter.OrderByDescending(x => x.NumberOfChapter).Take(5) : queryChapter.OrderBy(x => x.NumberOfChapter);
             if (queryChapter == null || !queryChapter.Any())
             {
                 methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -62,11 +71,13 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             }
             PagingItemsDTO<Chapter> pagingTagItemsDTO = await GetListPaging(queryChapter, pageIndex, pageSize).ConfigureAwait(false);
             IEnumerable<Chapter> resultListChapter = _mapper.Map<IEnumerable<Chapter>>(pagingTagItemsDTO.Items);
+            var indexMax = await GetIndexForChaptersAsync(storyId);
             IEnumerable<ChapterPreviewResponse> listChapterAndId = resultListChapter.Select(x => new ChapterPreviewResponse
             {
                 ChapterId = x.Id,
                 NumberOfChapter = x.NumberOfChapter,
-                ChapterName = x.ChapterTitle
+                ChapterName = x.ChapterTitle,
+                Index = indexMax
             });
             if (listChapterAndId == null || !listChapterAndId.Any())
             {
@@ -91,24 +102,36 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         /// <param name="storyId"></param>
         /// <param name="fromChapterId"></param>
         /// <param name="toChapterId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0)
+        public async Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
         {
             MethodResult<IEnumerable<ChapterModelResponse>> methodResult = new();
+
             var fromChapterNumber = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.Id == fromChapterId) ?? null;
             var toChapterNumber = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.Id == toChapterId) ?? null;
             long fromChapter = fromChapterNumber == null ? 1 : fromChapterNumber.NumberOfChapter;
             long toChapter = toChapterNumber == null ? 100 : toChapterNumber.NumberOfChapter;
-            List<Chapter>? cacheChapterPaging = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersPagingByStory, storyId, fromChapter, toChapter)}");
-            var chapterInfo = cacheChapterPaging is null || !cacheChapterPaging.Any() ? await _queryable.AsNoTracking().Where(x => x.StoryId == storyId && x.NumberOfChapter >= fromChapter && x.NumberOfChapter <= toChapter).Select(x => x).ToListAsync() : cacheChapterPaging;
-
-            if (cacheChapterPaging is null || !cacheChapterPaging.Any())
+            var chapterInfo = new List<Chapter>();
+            if (isSetCache)
             {
-                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersPagingByStory, storyId, fromChapter, toChapter)}",
-                   chapterInfo, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
+                List<Chapter>? cacheChapterPaging = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersPagingByStory, storyId, fromChapter, toChapter)}");
+                chapterInfo = cacheChapterPaging is null || !cacheChapterPaging.Any() ? await _queryable.AsNoTracking().Where(x => x.StoryId == storyId && x.NumberOfChapter >= fromChapter && x.NumberOfChapter <= toChapter).Select(x => x).ToListAsync() : cacheChapterPaging;
+
+                if (cacheChapterPaging is null || !cacheChapterPaging.Any())
+                {
+                    await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersPagingByStory, storyId, fromChapter, toChapter)}",
+                       chapterInfo, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
+                }
             }
+            else
+            {
+                chapterInfo = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId && x.NumberOfChapter >= fromChapter && x.NumberOfChapter <= toChapter).Select(x => x).ToListAsync();
+            }
+
             chapterInfo = chapterInfo.OrderBy(x => x.NumberOfChapter).ToList();
+            var indexMax = await GetIndexForChaptersAsync(storyId);
             if (chapterInfo == null || !chapterInfo.Any())
             {
                 methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -118,7 +141,14 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 );
                 return methodResult;
             }
+
             IEnumerable<ChapterModelResponse> resultGroupChapter = _mapper.Map<IEnumerable<ChapterModelResponse>>(chapterInfo);
+            var tempListResult = resultGroupChapter.ToList();
+            for (int i = 0; i < tempListResult.Count; i++)
+            {
+                tempListResult[i].Index = indexMax;
+            }
+            resultGroupChapter = tempListResult;
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = resultGroupChapter;
             return methodResult;
@@ -127,18 +157,28 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         /// Get total chapter by id story
         /// </summary>
         /// <param name="storyId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
-        public async Task<MethodResult<int>> GetTotalChapterOfStoryIdAsync(long storyId)
+        public async Task<MethodResult<int>> GetTotalChapterOfStoryIdAsync(long storyId, bool isSetCache = false)
         {
             MethodResult<int> methodResult = new();
-            int? cacheChapterTotal = await _cache.GetRecordAsync<int>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChapters, storyId)}");
-            if (cacheChapterTotal == 0)
+            var totalChapter = 0;
+            if (isSetCache)
             {
-                cacheChapterTotal = _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).Count();
-                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChapters, storyId)}",
-                    cacheChapterTotal, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
+                totalChapter = await _cache.GetRecordAsync<int>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChapters, storyId)}");
+                if (totalChapter == 0)
+                {
+                    totalChapter = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).CountAsync();
+                    await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChapters, storyId)}",
+                        totalChapter, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
+                }
             }
-            methodResult.Result = cacheChapterTotal.Value;
+            else
+            {
+                totalChapter = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).CountAsync();
+            }
+
+            methodResult.Result = totalChapter;
             methodResult.StatusCode = StatusCodes.Status200OK;
             return methodResult;
         }
@@ -211,9 +251,10 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             MethodResult<ChapterModelResponse> methodResult = new();
             var chapterNumber = _queryable.AsNoTracking().FirstOrDefault(x => x.Id == chapterId)?.NumberOfChapter;
             Chapter? cacheChapter = await _cache.GetRecordAsync<Chapter>($"{string.Format(StorySettingDefault.Instance.keyModelNextResponseChaptersByStory, chapterId)}");
-            var chapterResult = cacheChapter is null ? await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.StoryId == storyId && x.NumberOfChapter == chapterNumber + 1) : cacheChapter;
-            if (cacheChapter is null)
+            var chapterResult = cacheChapter;
+            if (chapterResult is null)
             {
+                chapterResult = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.StoryId == storyId && x.NumberOfChapter == chapterNumber + 1);
                 await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelNextResponseChaptersByStory, chapterId)}",
                    chapterResult, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
             }
@@ -246,9 +287,10 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             MethodResult<ChapterModelResponse> methodResult = new();
             Chapter? cacheChapter = await _cache.GetRecordAsync<Chapter>($"{string.Format(StorySettingDefault.Instance.keyModelPreviousResponseChaptersByStory, chapterId)}");
             var chapterNumber = _queryable.AsNoTracking().FirstOrDefault(x => x.Id == chapterId)?.NumberOfChapter;
-            var chapterResult = cacheChapter is null ? await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.StoryId == storyId && x.NumberOfChapter == chapterNumber - 1) : cacheChapter;
-            if (cacheChapter is null)
+            var chapterResult = cacheChapter;
+            if (chapterResult is null)
             {
+                chapterResult = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.StoryId == storyId && x.NumberOfChapter == chapterNumber - 1);
                 await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelPreviousResponseChaptersByStory, chapterId)}",
                    chapterResult, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
             }
@@ -274,19 +316,39 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         /// Get list chapter and paging according by 100 chapters each chunk
         /// </summary>
         /// <param name="storyId"></param>
+        /// <param name="isSetCache"></param>
         /// <returns></returns>
-        public async Task<MethodResult<List<ChapterListPagingResponse>>> PagingChapterListByStoryId(int storyId)
+        public async Task<MethodResult<List<ChapterListPagingResponse>>> PagingChapterListByStoryId(int storyId, bool isSetCache = false)
         {
             MethodResult<List<ChapterListPagingResponse>> methodResult = new()
             {
                 Result = new List<ChapterListPagingResponse>()
             };
-            List<Chapter>? cacheChapterTotal = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersByStory, storyId)}");
-            var chapterTotal = cacheChapterTotal is null || !cacheChapterTotal.Any() ? await _queryable.Where(x => x.StoryId == storyId).Select(x => x).ToListAsync() : cacheChapterTotal;
-            if (cacheChapterTotal is null || !cacheChapterTotal.Any())
+            var index = 0;
+            var chapterTotal = new List<Chapter>();
+            if (isSetCache)
             {
-                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersByStory, storyId)}",
-                   chapterTotal, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
+                var cacheChapterTotal = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersByStory, storyId)}");
+                chapterTotal = cacheChapterTotal;
+                if (chapterTotal is null || !chapterTotal.Any())
+                {
+                    chapterTotal = await _queryable.Where(x => x.StoryId == storyId).Select(x => x).ToListAsync();
+                    await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseTotalChaptersByStory, storyId)}",
+                       chapterTotal, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
+                }
+            }
+            else
+            {
+                chapterTotal = await _queryable.Where(x => x.StoryId == storyId).Select(x => x).ToListAsync();
+            }
+            if (chapterTotal == null)
+            {
+                methodResult.StatusCode = StatusCodes.Status404NotFound;
+                methodResult.AddApiErrorMessage(
+                    nameof(EnumChapterErrorCode.CT11),
+                    new[] { BaseConfig.EntityObject.Entity.Helpers.GenerateErrorResult(nameof(EnumChapterErrorCode.CT11), nameof(EnumChapterErrorCode.CT11)) }
+                );
+                return methodResult;
             }
             var totalLength = chapterTotal.Count;
             for (int i = 0; i < totalLength; i += 100)
@@ -296,7 +358,9 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                     From = i + 1,
                     To = Math.Min(i + 100, totalLength),
                     FromId = chapterTotal.FirstOrDefault(x => x.NumberOfChapter == i + 1)?.Id ?? 0,
-                    ToId = chapterTotal.FirstOrDefault(x => x.NumberOfChapter == Math.Min(i + 100, totalLength))?.Id ?? 0
+                    ToId = chapterTotal.FirstOrDefault(x => x.NumberOfChapter == Math.Min(i + 100, totalLength))?.Id ?? 0,
+                    Index = ++index,
+                    Total = (chapterTotal.FirstOrDefault(x => x.NumberOfChapter == Math.Min(i + 100, totalLength))?.NumberOfChapter - chapterTotal.FirstOrDefault(x => x.NumberOfChapter == i + 1)?.NumberOfChapter ?? 0) == 0 ? 0 : (chapterTotal.FirstOrDefault(x => x.NumberOfChapter == Math.Min(i + 100, totalLength))?.NumberOfChapter - chapterTotal.FirstOrDefault(x => x.NumberOfChapter == i + 1)?.NumberOfChapter ?? 0) + 1
                 };
                 methodResult.Result.Add(tempChapterListPaging);
             }
@@ -339,14 +403,8 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         public async Task<MethodResult<ChapterModelResponse>> GetDetailChapterById(int chapterId)
         {
             MethodResult<ChapterModelResponse> methodResult = new();
-            Chapter? cacheChapter = await _cache.GetRecordAsync<Chapter>($"{string.Format(StorySettingDefault.Instance.keyModelDetailChaptersByStory, chapterId)}");
-            var chapterResult = cacheChapter is null ? await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.Id == chapterId) : cacheChapter;
-            if (cacheChapter is null)
-            {
-                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelDetailChaptersByStory, chapterId)}",
-                   chapterResult, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
-            }
-            if (chapterResult == null)
+            var chapterResult = await _queryable.AsNoTracking().FirstOrDefaultAsync(x => x.Id == chapterId);
+            if (chapterResult is null)
             {
                 methodResult.StatusCode = StatusCodes.Status404NotFound;
                 methodResult.AddApiErrorMessage(
@@ -398,6 +456,73 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
 
             return chunksList.ToArray();
         }
-
+        /// <summary>
+        /// Group chapter by storyId
+        /// </summary>
+        /// <param name="pageSize"></param>
+        /// <param name="storyId"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="isSetCache"></param>
+        /// <returns></returns>
+        public async Task<MethodResult<PagingItemsDTO<ChapterModelResponse>>> GroupChapterListByStoryId(int storyId, int pageIndex = 1, int pageSize = 100, bool isSetCache = false)
+        {
+            MethodResult<PagingItemsDTO<ChapterModelResponse>> methodResult = new();
+            var chapterTotal = new List<Chapter>();
+            if (isSetCache)
+            {
+                var cacheGroupChapter = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelGroupChaptersByStory, storyId)}");
+                chapterTotal = cacheGroupChapter;
+                if (chapterTotal is null || !chapterTotal.Any())
+                {
+                    chapterTotal = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId).OrderBy(x => x.NumberOfChapter).Select(x => x).ToListAsync();
+                    await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelGroupChaptersByStory, storyId)}",
+                       chapterTotal, StorySettingDefault.Instance.expirationTimeModelAllStories, StorySettingDefault.Instance.slidingExpirationModelAllStories);
+                }
+            }
+            else
+            {
+                chapterTotal = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId).OrderBy(x => x.NumberOfChapter).Select(x => x).ToListAsync();
+            }
+            IQueryable<Chapter> queryChapter = chapterTotal.AsQueryable();
+            if (queryChapter == null || !queryChapter.Any())
+            {
+                methodResult.StatusCode = StatusCodes.Status400BadRequest;
+                methodResult.AddApiErrorMessage(
+                    nameof(EnumChapterErrorCode.CT11),
+                    new[] { BaseConfig.EntityObject.Entity.Helpers.GenerateErrorResult(nameof(EnumChapterErrorCode.CT11), nameof(EnumChapterErrorCode.CT11)) }
+                );
+                return methodResult;
+            }
+            PagingItemsDTO<Chapter> pagingTagItemsDTO = await GetListPaging(queryChapter, pageIndex, pageSize).ConfigureAwait(false);
+            IEnumerable<Chapter> resultListChapter = _mapper.Map<IEnumerable<Chapter>>(pagingTagItemsDTO.Items);
+            IEnumerable<ChapterModelResponse> resultGroupChapter = _mapper.Map<IEnumerable<ChapterModelResponse>>(resultListChapter);
+            methodResult.StatusCode = StatusCodes.Status200OK;
+            methodResult.Result = new PagingItemsDTO<ChapterModelResponse>
+            {
+                Items = resultGroupChapter,
+                PagingInfo = pagingTagItemsDTO.PagingInfo
+            };
+            return methodResult;
+        }
+        private async Task<int> GetIndexForChaptersAsync(long storyId)
+        {
+            var index = 0;
+            List<Chapter>? cacheQueryChapter = await _cache.GetRecordAsync<List<Chapter>>($"{string.Format(StorySettingDefault.Instance.keyModelResponseChapters, storyId)}");
+            var chapterResult = cacheQueryChapter;
+            if (chapterResult == null || !chapterResult.Any())
+            {
+                chapterResult = _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).ToList();
+                await _cache.SetRecordAsync($"{string.Format(StorySettingDefault.Instance.keyModelResponseChapters, storyId)}", chapterResult, StorySettingDefault.Instance.expirationTimeLogin, StorySettingDefault.Instance.slidingExpirationLogin);
+            }
+            if (chapterResult is null)
+            {
+                return ++index;
+            }
+            for (int i = 0; i < chapterResult.Count; i += 100)
+            {
+                ++index;
+            }
+            return index;
+        }
     }
 }

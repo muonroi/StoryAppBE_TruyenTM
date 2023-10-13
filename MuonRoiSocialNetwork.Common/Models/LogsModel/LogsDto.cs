@@ -40,5 +40,10 @@ namespace MuonRoiSocialNetwork.Common.Models.Logs
 
         [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
+        [JsonProperty("request")]
+        public string Request { get; set; } = string.Empty;
+
+        [JsonProperty("response")]
+        public string Response { get; set; }
     }
 }

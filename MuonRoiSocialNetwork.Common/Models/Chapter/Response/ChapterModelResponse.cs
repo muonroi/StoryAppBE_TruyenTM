@@ -9,5 +9,9 @@ namespace MuonRoiSocialNetwork.Common.Models.Chapter.Response
         public List<string> BodyChunk { get; set; }
         [JsonProperty("chunk_size")]
         public int ChunkSize { get; set; }
+        [JsonProperty("index")]
+        public int Index { get; set; }
+
+
     }
 }

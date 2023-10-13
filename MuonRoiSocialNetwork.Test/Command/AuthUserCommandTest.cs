@@ -45,7 +45,7 @@ namespace MuonRoiSocialNetwork.Test.Command
                 Username = "test2",
                 Password = "1234567Az*99",
             };
-            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null);
+            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null, null);
             MethodResult<UserModelResponse> result = await handler.Handle(user, CancellationToken.None);
             result.ShouldBeOfType<MethodResult<UserModelResponse>>();
         }
@@ -65,7 +65,7 @@ namespace MuonRoiSocialNetwork.Test.Command
                 string.IsNullOrEmpty(user.Username) ? nameof(EnumUserErrorCodes.USR05C) : nameof(EnumUserErrorCodes.USR06C),
                 new[] { Helpers.GenerateErrorResult(nameof(user.Username), user.Username ?? "") }
             );
-            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null);
+            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null, null);
             MethodResult<UserModelResponse> result = await handler.Handle(user, CancellationToken.None);
             bool resultMessageAndCode = CheckObjectEqual.ObjectAreEqual(result, methodResult);
             Assert.True(resultMessageAndCode);
@@ -85,7 +85,7 @@ namespace MuonRoiSocialNetwork.Test.Command
                 nameof(EnumUserErrorCodes.USR02C),
                 new[] { Helpers.GenerateErrorResult(nameof(user.Username), user.Username ?? "") }
             );
-            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null);
+            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null, null);
             MethodResult<UserModelResponse> result = await handler.Handle(user, CancellationToken.None);
             bool resultMessageAndCode = CheckObjectEqual.ObjectAreEqual(result, methodResult);
             Assert.True(resultMessageAndCode);
@@ -105,7 +105,7 @@ namespace MuonRoiSocialNetwork.Test.Command
                 nameof(EnumUserErrorCodes.USR28C),
                 new[] { Helpers.GenerateErrorResult(nameof(user.Username), user.Username ?? "") }
             );
-            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null);
+            AuthUserCommandHandler handler = new(_mapper, _user, _userQueries, _config, _logger, _mediator, _cache, null, null, null, null, null, null);
             MethodResult<UserModelResponse> result = await handler.Handle(user, CancellationToken.None);
             bool resultMessageAndCode = CheckObjectEqual.ObjectAreEqual(result, methodResult);
             Assert.True(resultMessageAndCode);
