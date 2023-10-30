@@ -11,6 +11,8 @@ namespace MuonRoiSocialNetwork.Common.Models.Chapter.Response
         public int ChunkSize { get; set; }
         [JsonProperty("index")]
         public int Index { get; set; }
+        [JsonProperty("current_group_index")]
+        public int GroupIndex { get; set; }
 
 
     }

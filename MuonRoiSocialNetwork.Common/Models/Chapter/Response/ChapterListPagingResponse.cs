@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-
+﻿
 namespace MuonRoiSocialNetwork.Common.Models.Chapter.Response
 {
     public class ChapterListPagingResponse

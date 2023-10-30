@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BaseConfig.EntityObject.Entity;
 using BaseConfig.Exeptions;
-using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using MediatR;
 using MuonRoi.Social_Network.Storys;
@@ -29,7 +28,6 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
     {
         private readonly IStoryNotificationRepository _storyNotificationRepository;
         private readonly ILogger<UpdateNotificationCommandHandler> _logger;
-        private readonly AuthContext _authContext;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -39,12 +37,10 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="storiesRepository"></param>
         /// <param name="storyNotificationRepository"></param>
         /// <param name="logger"></param>
-        /// <param name="authContext"></param>
-        public UpdateNotificationCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IStoryNotificationRepository storyNotificationRepository, ILoggerFactory logger, AuthContext authContext) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        public UpdateNotificationCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IStoryNotificationRepository storyNotificationRepository, ILoggerFactory logger) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _storyNotificationRepository = storyNotificationRepository;
             _logger = logger.CreateLogger<UpdateNotificationCommandHandler>();
-            _authContext = authContext;
         }
         /// <summary>
         /// Function handler
@@ -59,8 +55,8 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
             try
             {
                 #region Get notification
-                var notificationInfo = await _storyNotificationRepository.GetWhereAsync(x => x.Id == request.NotificationId && x.UserGuid == Guid.Parse(_authContext.CurrentUserId));
-                if (notificationInfo is null || !notificationInfo.Any())
+                var notificationInfo = await _storyNotificationRepository.GetByIdAsync(request.NotificationId);
+                if (notificationInfo is null)
                 {
                     methodResult.StatusCode = StatusCodes.Status400BadRequest;
                     methodResult.AddApiErrorMessage(
@@ -72,8 +68,8 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Update notification to seen
-                notificationInfo.First().NotificationSate = EnumStateNotification.SEEN;
-                _storyNotificationRepository.Update(notificationInfo.First());
+                notificationInfo.NotificationSate = EnumStateNotification.SEEN;
+                _storyNotificationRepository.Update(notificationInfo);
                 await _storyNotificationRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
                 #endregion
 

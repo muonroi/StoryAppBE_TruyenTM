@@ -8,5 +8,6 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories
     /// </summary>
     public interface IStoryNotificationRepository : IRepository<StoryNotifications>
     {
+
     }
 }

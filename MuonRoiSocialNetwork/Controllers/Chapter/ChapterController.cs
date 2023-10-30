@@ -252,11 +252,11 @@ namespace MuonRoiSocialNetwork.Controllers.Chapter
         [AllowAnonymous]
         [ProducesResponseType(typeof(MethodResult<IEnumerable<ChapterModelResponse>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
+        public async Task<IActionResult> GetGroupChapter([FromQuery] int storyId, int pageIndex, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
         {
             try
             {
-                MethodResult<IEnumerable<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, fromChapterId, toChapterId, isSetCache).ConfigureAwait(false);
+                MethodResult<IEnumerable<ChapterModelResponse>> methodResult = await _chapterQueries.GetGroupChapterAsync(storyId, pageIndex, fromChapterId, toChapterId, isSetCache).ConfigureAwait(false);
                 return methodResult.GetActionResult();
             }
             catch (Exception ex)

@@ -1,9 +1,11 @@
-#DockerFile
 # Use the .NET 6 SDK as the build environment
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 
 # Set the working directory
 WORKDIR /app
+
+# Clear the contents of the /app directory
+RUN rm -rf /app/*
 
 # Copy your .csproj and .sln files and restore dependencies
 COPY MuonRoiSocialNetwork/*.csproj ./
@@ -18,10 +20,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=build-env /app/out .
 
+
+# Set the environment variable
+ENV ASPNETCORE_URLS http://localhost:5001
+
 # Expose the port your application listens on
-EXPOSE 80
+EXPOSE 5001
 
 # Define the entry point for your application
 ENTRYPOINT ["dotnet", "MuonRoiSocialNetwork.dll"]
-
-

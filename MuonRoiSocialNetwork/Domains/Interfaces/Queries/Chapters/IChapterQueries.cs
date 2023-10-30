@@ -26,8 +26,9 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// <param name="fromChapterId"></param>
         /// <param name="toChapterId"></param>
         /// <param name="isSetCache"></param>
+        /// <param name="pageIndex"></param>
         /// <returns></returns>
-        Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false);
+        Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, int pageIndex, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false);
 
         /// <summary>
         /// Get list chapters of story
@@ -94,5 +95,11 @@ namespace MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters
         /// <param name="isSetCache"></param>
         /// <returns></returns>
         Task<MethodResult<PagingItemsDTO<ChapterModelResponse>>> GroupChapterListByStoryId(int storyId, int pageIndex = 1, int pageSize = 100, bool isSetCache = false);
+        /// <summary>
+        /// Get total chapter by storyId
+        /// </summary>
+        /// <param name="storyId"></param>
+        /// <returns></returns>
+        Task<MethodResult<ChapterTotalByStoryIdResponse>> GetTotalChapterByStoryId(long storyId);
     }
 }

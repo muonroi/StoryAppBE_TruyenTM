@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BaseConfig.BaseDbContext.BaseQuery;
 using BaseConfig.BaseDbContext.Common;
+using BaseConfig.Extentions.String;
 using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using MuonRoiSocialNetwork.Common.Models.Chapter.Response;
 using MuonRoiSocialNetwork.Common.Settings.StorySettings;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Chapters;
 using MuonRoiSocialNetwork.Infrastructure.Helpers;
+using System.Net;
 using System.Text;
 
 namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
@@ -72,12 +74,20 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             PagingItemsDTO<Chapter> pagingTagItemsDTO = await GetListPaging(queryChapter, pageIndex, pageSize).ConfigureAwait(false);
             IEnumerable<Chapter> resultListChapter = _mapper.Map<IEnumerable<Chapter>>(pagingTagItemsDTO.Items);
             var indexMax = await GetIndexForChaptersAsync(storyId);
+            var totalChunkLatest = 0;
+            if (isLatest)
+            {
+                var queryPaging = _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x);
+                var tempPaging = await GetListPaging(queryPaging, indexMax, 100).ConfigureAwait(false);
+                totalChunkLatest = tempPaging.Items == null ? 0 : tempPaging.Items.Count();
+            }
             IEnumerable<ChapterPreviewResponse> listChapterAndId = resultListChapter.Select(x => new ChapterPreviewResponse
             {
                 ChapterId = x.Id,
                 NumberOfChapter = x.NumberOfChapter,
                 ChapterName = x.ChapterTitle,
-                Index = indexMax
+                Index = indexMax,
+                TotalChapterAtLastChunk = totalChunkLatest
             });
             if (listChapterAndId == null || !listChapterAndId.Any())
             {
@@ -88,6 +98,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 );
                 return methodResult;
             }
+
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = new PagingItemsDTO<ChapterPreviewResponse>
             {
@@ -103,9 +114,10 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
         /// <param name="fromChapterId"></param>
         /// <param name="toChapterId"></param>
         /// <param name="isSetCache"></param>
+        /// <param name="pageIndex"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
+        public async Task<MethodResult<IEnumerable<ChapterModelResponse>>> GetGroupChapterAsync(long storyId, int pageIndex, long fromChapterId = 0, long toChapterId = 0, bool isSetCache = false)
         {
             MethodResult<IEnumerable<ChapterModelResponse>> methodResult = new();
 
@@ -147,6 +159,8 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             for (int i = 0; i < tempListResult.Count; i++)
             {
                 tempListResult[i].Index = indexMax;
+                tempListResult[i].Body = StringManagers.DecompressHtml(tempListResult[i].Body);
+                tempListResult[i].GroupIndex = pageIndex;
             }
             resultGroupChapter = tempListResult;
             methodResult.StatusCode = StatusCodes.Status200OK;
@@ -205,10 +219,15 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             PagingItemsDTO<Chapter> pagingTagItemsDTO = await GetListPaging(queryChapter, pageIndex, pageSize).ConfigureAwait(false);
             IEnumerable<Chapter> resultListChapter = _mapper.Map<IEnumerable<Chapter>>(pagingTagItemsDTO.Items);
             IEnumerable<ChapterModelResponse> resultGroupChapter = _mapper.Map<IEnumerable<ChapterModelResponse>>(resultListChapter);
+            var changeChapterToList = resultGroupChapter.ToList();
+            for (int i = 0; i < changeChapterToList.Count; i++)
+            {
+                changeChapterToList[i].Body = StringManagers.DecompressHtml(changeChapterToList[i].Body);
+            }
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = new PagingItemsDTO<ChapterModelResponse>
             {
-                Items = resultGroupChapter.OrderBy(x => x.NumberOfChapter),
+                Items = changeChapterToList.OrderBy(x => x.NumberOfChapter),
                 PagingInfo = pagingTagItemsDTO.PagingInfo
             };
             return methodResult;
@@ -268,10 +287,11 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 return methodResult;
             }
             ChapterModelResponse resultGroupChapter = _mapper.Map<ChapterModelResponse>(chapterResult);
-            List<string> chunksContent = SplitToChunks(chapterResult.Body, _chunkSize).ToList();
+            List<string> chunksContent = SplitToChunks(StringManagers.DecompressHtml(resultGroupChapter.Body), _chunkSize).ToList();
             chunksContent.RemoveAll(x => x is null);
             resultGroupChapter.BodyChunk = chunksContent;
             resultGroupChapter.ChunkSize = chunksContent.Count;
+            resultGroupChapter.Body = StringManagers.DecompressHtml(resultGroupChapter.Body);
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = resultGroupChapter;
             return methodResult;
@@ -304,10 +324,11 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 return methodResult;
             }
             ChapterModelResponse resultGroupChapter = _mapper.Map<ChapterModelResponse>(chapterResult);
-            List<string> chunksContent = SplitToChunks(chapterResult.Body, _chunkSize).ToList();
+            List<string> chunksContent = SplitToChunks(StringManagers.DecompressHtml(resultGroupChapter.Body), _chunkSize).ToList();
             chunksContent.RemoveAll(x => x is null);
             resultGroupChapter.BodyChunk = chunksContent;
             resultGroupChapter.ChunkSize = chunksContent.Count;
+            resultGroupChapter.Body = StringManagers.DecompressHtml(resultGroupChapter.Body);
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = resultGroupChapter;
             return methodResult;
@@ -386,7 +407,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 );
                 return methodResult;
             }
-            List<string> chunksContent = SplitToChunks(chapterInfo.Body, chunkSize).ToList();
+            List<string> chunksContent = SplitToChunks(StringManagers.DecompressHtml(chapterInfo.Body), chunkSize).ToList();
             ChapterChunkResponse resultGroupChapter = _mapper.Map<ChapterChunkResponse>(chapterInfo);
             chunksContent.RemoveAll(x => x is null);
             resultGroupChapter.BodyChunk = chunksContent;
@@ -414,10 +435,11 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 return methodResult;
             }
             ChapterModelResponse resultGroupChapter = _mapper.Map<ChapterModelResponse>(chapterResult);
-            List<string> chunksContent = SplitToChunks(chapterResult.Body, _chunkSize).ToList();
+            List<string> chunksContent = SplitToChunks(StringManagers.DecompressHtml(resultGroupChapter.Body), _chunkSize).ToList();
             chunksContent.RemoveAll(x => x is null);
             resultGroupChapter.BodyChunk = chunksContent;
             resultGroupChapter.ChunkSize = chunksContent.Count;
+            resultGroupChapter.Body = StringManagers.DecompressHtml(resultGroupChapter.Body);
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = resultGroupChapter;
             return methodResult;
@@ -495,7 +517,15 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
             }
             PagingItemsDTO<Chapter> pagingTagItemsDTO = await GetListPaging(queryChapter, pageIndex, pageSize).ConfigureAwait(false);
             IEnumerable<Chapter> resultListChapter = _mapper.Map<IEnumerable<Chapter>>(pagingTagItemsDTO.Items);
-            IEnumerable<ChapterModelResponse> resultGroupChapter = _mapper.Map<IEnumerable<ChapterModelResponse>>(resultListChapter);
+            List<ChapterModelResponse> resultGroupChapter = _mapper.Map<List<ChapterModelResponse>>(resultListChapter);
+            for (int i = 0; i < resultGroupChapter.Count; i++)
+            {
+                List<string> chunksContent = SplitToChunks(StringManagers.DecompressHtml(resultGroupChapter[i].Body), _chunkSize).ToList();
+                chunksContent.RemoveAll(x => x is null);
+                resultGroupChapter[i].BodyChunk = chunksContent;
+                resultGroupChapter[i].ChunkSize = chunksContent.Count;
+                resultGroupChapter[i].Body = StringManagers.DecompressHtml(resultGroupChapter[i].Body);
+            }
             methodResult.StatusCode = StatusCodes.Status200OK;
             methodResult.Result = new PagingItemsDTO<ChapterModelResponse>
             {
@@ -503,6 +533,23 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Chapters
                 PagingInfo = pagingTagItemsDTO.PagingInfo
             };
             return methodResult;
+        }
+        /// <summary>
+        /// Get total chapter by story id
+        /// </summary>
+        /// <param name="storyId"></param>
+        /// <returns></returns>
+        public async Task<MethodResult<ChapterTotalByStoryIdResponse>> GetTotalChapterByStoryId(long storyId)
+        {
+            var methodResult = new MethodResult<ChapterTotalByStoryIdResponse>();
+            var chapterResult = await _queryable.AsNoTracking().Where(x => x.StoryId == storyId).Select(x => x).CountAsync();
+            methodResult.Result = new ChapterTotalByStoryIdResponse
+            {
+                ChapterTotal = chapterResult
+            };
+            methodResult.StatusCode = StatusCodes.Status200OK;
+            return methodResult;
+
         }
         private async Task<int> GetIndexForChaptersAsync(long storyId)
         {

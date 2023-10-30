@@ -2,13 +2,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using MuonRoiSocialNetwork.Common.Settings.Appsettings;
-using System.Security.Claims;
-using Microsoft.Extensions.Options;
-using static Microsoft.IO.RecyclableMemoryStreamManager;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using static IdentityModel.ClaimComparer;
-using Microsoft.AspNetCore.Identity;
-using System.Net;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {

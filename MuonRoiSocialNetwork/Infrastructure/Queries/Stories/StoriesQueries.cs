@@ -153,6 +153,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
             for (int i = 0; i < resultStories.Count; i++)
             {
                 resultStories[i].UpdatedDateString = GetTimeDifferenceText(resultStories[i].UpdatedDateTs ?? 0);
+                resultStories[i].TotalPageIndex = await GetTotalPageIndex(resultStories[i].Id);
             }
             methodResult.Result = new PagingItemsDTO<StoryModelResponse>
             {
@@ -160,6 +161,12 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
                 PagingInfo = pagingStoryItemsDTO.PagingInfo
             };
             return methodResult;
+        }
+        private async Task<int> GetTotalPageIndex(long storyId)
+        {
+            var totalChapter = await _chapterQueries.GetTotalChapterByStoryId(storyId);
+            if (!totalChapter.IsOK || totalChapter.Result is null) return 0;
+            return (int)Math.Ceiling((double)totalChapter.Result.ChapterTotal / 100);
         }
         /// <summary>
         /// Get all story
@@ -216,6 +223,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
                 resultStories[i].TotalChapter = totalChapterResult.Result;
                 resultStories[i].UpdatedDateString = GetTimeDifferenceText(resultStories[i].UpdatedDateTs ?? 0);
                 resultStories[i].RankNumber = i + 1;
+                resultStories[i].TotalPageIndex = await GetTotalPageIndex(resultStories[i].Id);
             }
             methodResult.Result = new PagingItemsDTO<StoryModelResponse>
             {
@@ -291,6 +299,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
 
             SetMoreVariableStory(ref resultStories, tagOfStory.Select(x => x.tagsSingle.TagName).ToList(), categoryOfStorys == null ? string.Empty : categoryOfStorys.NameCategory ?? string.Empty, JsonConvert.DeserializeObject<StoryRattings>(querySearch.ListRattings)?.Data.Count ?? 0, firstAndLastChapter?.Result?.Keys?.FirstOrDefault() ?? 0, firstAndLastChapter?.Result?.Values?.FirstOrDefault() ?? 0);
             resultStories.IsBookmark = bookmarkResult.Result != null;
+            resultStories.TotalPageIndex = await GetTotalPageIndex(resultStories.Id);
             methodResult.Result = resultStories;
 
             return methodResult;
@@ -390,6 +399,7 @@ namespace MuonRoiSocialNetwork.Infrastructure.Queries.Stories
             for (int i = 0; i < resultStories.Count; i++)
             {
                 resultStories[i].UpdatedDateString = GetTimeDifferenceText(resultStories[i].UpdatedDateTs ?? 0);
+                resultStories[i].TotalPageIndex = await GetTotalPageIndex(resultStories[i].Id);
             }
             methodResult.Result = new PagingItemsDTO<StoryModelResponse>
             {

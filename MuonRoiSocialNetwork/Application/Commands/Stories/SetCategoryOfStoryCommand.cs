@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using BaseConfig.EntityObject.Entity;
-using BaseConfig.Infrashtructure;
 using BaseConfig.MethodResult;
 using MediatR;
 using MuonRoi.Social_Network.Categories;
 using MuonRoi.Social_Network.Storys;
 using MuonRoiSocialNetwork.Application.Commands.Base.Stories;
-using MuonRoiSocialNetwork.Common.Enums.Storys;
 using MuonRoiSocialNetwork.Domains.Interfaces.Commands.Stories;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Category;
 using MuonRoiSocialNetwork.Domains.Interfaces.Queries.Stories;

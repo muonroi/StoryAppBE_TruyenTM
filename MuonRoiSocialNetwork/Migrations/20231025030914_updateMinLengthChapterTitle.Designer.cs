@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MuonRoiSocialNetwork.Infrastructure;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MuonRoiSocialNetwork.Migrations
 {
     [DbContext(typeof(MuonRoiSocialNetworkDbContext))]
-    partial class MuonRoiSocialNetworkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025030914_updateMinLengthChapterTitle")]
+    partial class updateMinLengthChapterTitle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,7 +126,8 @@ namespace MuonRoiSocialNetwork.Migrations
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100000)
+                        .HasColumnType("character varying(100000)")
                         .HasColumnName("body");
 
                     b.Property<string>("ChapterTitle")

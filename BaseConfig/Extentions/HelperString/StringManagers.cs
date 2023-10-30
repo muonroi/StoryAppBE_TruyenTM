@@ -1,5 +1,6 @@
 ﻿using Slugify;
 using System.Globalization;
+using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -98,6 +99,29 @@ namespace BaseConfig.Extentions.String
         }
         static public string GenerateSlug(this string textString)
        => _slugHelper.GenerateSlug(textString.NormalizeString());
+
+        public static string CompressHtml(string html)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(html);
+
+            using var memoryStream = new MemoryStream();
+            using (GZipStream gzipStream = new(memoryStream, CompressionMode.Compress, true))
+            {
+                gzipStream.Write(buffer, 0, buffer.Length);
+            }
+
+            return Convert.ToBase64String(memoryStream.ToArray());
+        }
+
+        public static string DecompressHtml(string compressedHtml)
+        {
+            byte[] buffer = Convert.FromBase64String(compressedHtml);
+
+            using var memoryStream = new MemoryStream(buffer);
+            using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+            using var reader = new StreamReader(gzipStream);
+            return reader.ReadToEnd();
+        }
     }
 
 }

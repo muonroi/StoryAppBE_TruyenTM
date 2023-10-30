@@ -22,7 +22,6 @@ using MuonRoiSocialNetwork.Common.Models.Users.Base.Response;
 using MuonRoiSocialNetwork.Common.Models.Users.Request;
 using MuonRoiSocialNetwork.Common.Models.Users.Response;
 using MuonRoiSocialNetwork.Domains.DomainObjects.Groups;
-using MuonRoiSocialNetwork.Infrastructure.Map.Chapter;
 using CategoryEntities = MuonRoi.Social_Network.Categories.Category;
 using ChapterEntites = MuonRoi.Social_Network.Chapters.Chapter;
 

@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using static IdentityModel.ClaimComparer;
 
 namespace MuonRoiSocialNetwork.StartupConfig
 {
@@ -24,7 +23,7 @@ namespace MuonRoiSocialNetwork.StartupConfig
         {
             /*{builder.Environment.EnvironmentName}*/
             var customAppsetting = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.Production.json", optional: true);
+            .AddJsonFile($"appsettings.Development.json", optional: true);
             var config = customAppsetting.Build();
             builder.Services.CustomAuthentication(config);
             builder.Services.CustomAuthorization();

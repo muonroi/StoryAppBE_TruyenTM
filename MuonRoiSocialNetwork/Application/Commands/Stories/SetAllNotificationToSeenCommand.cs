@@ -25,6 +25,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
     public class SetAllNotificationToSeenCommandHandler : BaseStoriesCommandHandler, IRequestHandler<SetAllNotificationToSeenCommand, MethodResult<bool>>
     {
         private readonly IStoryNotificationRepository _storyNotificationRepository;
+        private readonly IStoryNotificationQueries _storyNotificationQuerie;
         private readonly ILogger<SetAllNotificationToSeenCommandHandler> _logger;
         private readonly AuthContext _authContext;
         /// <summary>
@@ -37,11 +38,13 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
         /// <param name="storyNotificationRepository"></param>
         /// <param name="logger"></param>
         /// <param name="authContext"></param>
-        public SetAllNotificationToSeenCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IStoryNotificationRepository storyNotificationRepository, ILoggerFactory logger, AuthContext authContext) : base(mapper, configuration, storiesQuerie, storiesRepository)
+        /// <param name="storyNotificationQuerie"></param>
+        public SetAllNotificationToSeenCommandHandler(IMapper mapper, IConfiguration configuration, IStoriesQueries storiesQuerie, IStoriesRepository storiesRepository, IStoryNotificationRepository storyNotificationRepository, ILoggerFactory logger, AuthContext authContext, IStoryNotificationQueries storyNotificationQuerie) : base(mapper, configuration, storiesQuerie, storiesRepository)
         {
             _storyNotificationRepository = storyNotificationRepository;
             _logger = logger.CreateLogger<SetAllNotificationToSeenCommandHandler>();
             _authContext = authContext;
+            _storyNotificationQuerie = storyNotificationQuerie;
         }
         /// <summary>
         /// function Handle
@@ -55,8 +58,9 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
             var methodResult = new MethodResult<bool>();
             try
             {
+                //x => x.UserGuid == Guid.Parse(_authContext.CurrentUserId)
                 #region Get notification
-                var notificationInfo = await _storyNotificationRepository.GetWhereAsync(x => x.UserGuid == Guid.Parse(_authContext.CurrentUserId));
+                var notificationInfo = await _storyNotificationQuerie.GetAllAsync();
                 if (notificationInfo is null || !notificationInfo.Any())
                 {
                     methodResult.StatusCode = StatusCodes.Status400BadRequest;
@@ -69,10 +73,14 @@ namespace MuonRoiSocialNetwork.Application.Commands.Stories
                 #endregion
 
                 #region Update notification to seen
-                for (int i = 0; i < notificationInfo.ToList().Count; i++)
+                for (int i = 0; i < notificationInfo.Count; i++)
                 {
-                    notificationInfo.ToList()[i].NotificationSate = EnumStateNotification.SEEN;
-                    _storyNotificationRepository.Update(notificationInfo.ToList()[i]);
+                    if (notificationInfo[i].UserGuid == Guid.Parse(_authContext.CurrentUserId))
+                    {
+                        notificationInfo[i].NotificationSate = EnumStateNotification.SEEN;
+                        _storyNotificationRepository.Update(notificationInfo[i]);
+                    }
+
                 }
                 await _storyNotificationRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
                 #endregion

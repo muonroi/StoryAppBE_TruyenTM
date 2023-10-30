@@ -19,5 +19,7 @@ namespace MuonRoiSocialNetwork.Common.Models.Stories.Response
         public string? SlugAuthor { get; set; }
         [JsonProperty("is_bookmark")]
         public bool? IsBookmark { get; set; }
+        [JsonProperty("total_pageindex")]
+        public int TotalPageIndex { get; set; }
     }
 }

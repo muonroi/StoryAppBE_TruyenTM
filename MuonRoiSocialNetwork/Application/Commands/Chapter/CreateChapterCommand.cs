@@ -97,6 +97,7 @@ namespace MuonRoiSocialNetwork.Application.Commands.Chapter
                 #endregion
 
                 #region Create new chapter
+                newChapter.Body = StringManagers.CompressHtml(newChapter.Body);
                 _chapterRepository.Add(newChapter);
                 int checkStatus = await _chapterRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 if (checkStatus < 1)

@@ -6,5 +6,7 @@
         public long NumberOfChapter { get; set; }
         public string ChapterName { get; set; } = string.Empty;
         public int Index { get; set; }
+        public int TotalChapterAtLastChunk { get; set; }
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using MuonRoiSocialNetwork.Infrastructure;
 using MuonRoiSocialNetwork.Infrastructure.HubCentral;
 
@@ -34,7 +33,6 @@ namespace MuonRoiSocialNetwork.StartupConfig
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
                 var context = services.GetRequiredService<MuonRoiSocialNetworkDbContext>();
                 context.Database.Migrate();
             }

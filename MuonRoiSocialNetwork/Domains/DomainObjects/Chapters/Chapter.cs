@@ -15,14 +15,12 @@ namespace MuonRoi.Social_Network.Chapters
         /// </summary>
         [Required(ErrorMessage = nameof(EnumChapterErrorCode.CT00))]
         [MaxLength(255, ErrorMessage = nameof(EnumChapterErrorCode.CT01))]
-        [MinLength(3, ErrorMessage = nameof(EnumChapterErrorCode.CT02))]
         [Column("chapter_title")]
         public string ChapterTitle { get; set; } = string.Empty;
         /// <summary>
         /// Content of story
         /// </summary>
         [Required(ErrorMessage = nameof(EnumChapterErrorCode.CT04))]
-        [MaxLength(100000, ErrorMessage = nameof(EnumChapterErrorCode.CT05))]
         [MinLength(750, ErrorMessage = nameof(EnumChapterErrorCode.CT06))]
         [Column("body")]
         public string Body { get; set; } = string.Empty;
